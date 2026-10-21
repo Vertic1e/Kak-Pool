@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Pro 3D 8-Ball Pool Club — PC &amp; Mobile Billiards</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -15,16 +18,25 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     html, body {
       margin: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      width: 100dvw;
+      height: 100dvh;
       overflow: hidden;
+      overscroll-behavior: none;
       background: #070d14;
       color: #f8fafc;
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      touch-action: none;
+    }
+    #webgl-container {
+      width: 100%;
+      height: 100%;
       touch-action: none;
     }
     #webgl-container canvas {
@@ -32,6 +44,7 @@
       width: 100% !important;
       height: 100% !important;
       outline: none;
+      touch-action: none;
     }
     body.gameplay-cursor-hidden,
     body.gameplay-cursor-hidden #webgl-container,
@@ -50,6 +63,58 @@
     }
     .power-rail-gradient {
       background: linear-gradient(to top, #22c55e 0%, #eab308 55%, #ef4444 100%);
+    }
+    /* Faded Pop-Up Status Toast Animation */
+    .status-popup-fade {
+      opacity: 0;
+      transform: translate(-50%, -6px) scale(0.97);
+      transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1), transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .status-popup-fade.show {
+      opacity: 0.92;
+      transform: translate(-50%, 0) scale(1);
+    }
+    /* Safe-area & Dynamic Mobile Landscape / Compact Display Ratio Adjustments */
+    .safe-top-hud {
+      padding-top: max(0.5rem, env(safe-area-inset-top));
+      padding-left: max(0.65rem, env(safe-area-inset-left));
+      padding-right: max(0.65rem, env(safe-area-inset-right));
+    }
+    .safe-left-dock {
+      left: max(0.6rem, env(safe-area-inset-left));
+      bottom: max(0.6rem, env(safe-area-inset-bottom));
+    }
+    .safe-right-dock {
+      right: max(0.6rem, env(safe-area-inset-right));
+      bottom: max(0.6rem, env(safe-area-inset-bottom));
+    }
+    @media (max-height: 520px), (max-width: 740px) {
+      #p1-card, #p2-card {
+        min-width: 132px !important;
+        max-width: 37vw !important;
+        padding: 0.35rem 0.6rem !important;
+        border-radius: 0.85rem !important;
+      }
+      #spin-card-panel {
+        width: 102px !important;
+        padding: 0.45rem !important;
+      }
+      #spin-pad {
+        width: 3.35rem !important;
+        height: 3.35rem !important;
+      }
+      #power-slider-track {
+        width: 2.35rem !important;
+        height: 8.8rem !important;
+      }
+      #cue-slider-stick {
+        height: 6.5rem !important;
+      }
+      #bih-confirm-bar {
+        bottom: 0.55rem !important;
+        padding: 0.4rem 0.7rem !important;
+        max-width: 66vw !important;
+      }
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -82,107 +147,98 @@
     </button>
   </div>
 
-  <!-- Top HUD Bar: Redesigned Clean Layout (P1 Card, Center Score & Status Pill, P2/Bot Card) -->
-  <header class="fixed top-0 left-0 right-0 z-20 px-3 pt-2.5 pointer-events-none flex items-start justify-between gap-2.5">
+  <!-- Top HUD Bar: Clean Non-Overlapping Layout (P1 Card, Compact Center Score & Controls, P2/Bot Card) -->
+  <header class="safe-top-hud fixed top-0 left-0 right-0 z-20 pointer-events-none flex items-start justify-between gap-2">
     <!-- Player 1 Card -->
-    <div id="p1-card" class="glass-panel pointer-events-auto rounded-2xl px-3.5 py-2 min-w-[165px] sm:min-w-[225px] transition-all shadow-lg">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span id="p1-turn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs text-emerald-400 font-extrabold">&#128100;</span>
-            <span id="p1-name-label" class="font-bold text-xs sm:text-sm text-white truncate max-w-[90px]">Player 1</span>
-          </div>
+    <div id="p1-card" class="glass-panel pointer-events-auto rounded-2xl px-3 py-1.5 min-w-[148px] sm:min-w-[215px] transition-all shadow-lg">
+      <div class="flex items-center justify-between gap-1.5">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span id="p1-turn-dot" class="w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs text-emerald-400 font-extrabold shrink-0">&#128100;</span>
+          <span id="p1-name-label" class="font-bold text-xs sm:text-sm text-white truncate max-w-[78px] sm:max-w-[100px]">Player 1</span>
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 shrink-0">
           <span id="p1-score-badge" title="Player 1 Match Wins" class="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
             0 W
           </span>
-          <span id="p1-group-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-800 text-slate-200 border border-slate-700/80">
+          <span id="p1-group-badge" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-200 border border-slate-700/80">
             OPEN
           </span>
         </div>
       </div>
-      <div id="p1-balls-row" class="flex items-center gap-1 mt-1.5 min-h-[18px] flex-wrap"></div>
+      <div id="p1-balls-row" class="flex items-center gap-1 mt-1 min-h-[16px] flex-wrap"></div>
     </div>
 
-    <!-- Center Scoreboard & Status Pill -->
-    <div class="flex flex-col items-center gap-1.5 pointer-events-auto max-w-[52vw]">
-      <div class="glass-panel rounded-full px-4 py-1.5 flex items-center gap-2.5 shadow-xl border border-slate-700/60">
+    <!-- Compact Center Scoreboard & Quick Menu Buttons (No Online Tag or Cluttered Permanent Instruction Banner) -->
+    <div class="flex flex-col items-center gap-1 pointer-events-auto shrink-0">
+      <div class="glass-panel rounded-full px-2.5 py-1 flex items-center gap-1.5 sm:gap-2 shadow-xl border border-slate-700/60">
         <span id="online-hud-dot" class="hidden w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
         <span id="hud-score-pill" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-[11px] font-mono font-extrabold text-amber-300 whitespace-nowrap">
           &#127942; 0 &ndash; 0
         </span>
-        <span id="hud-status-banner" class="text-xs sm:text-sm font-semibold text-emerald-300 truncate tracking-wide">
-          Player 1 to Break (Breaker Cue) — Place Cue Ball Behind Line
-        </span>
-        <span id="hud-fps-badge" class="hidden md:inline-block text-[10px] font-mono text-slate-400 border-l border-slate-700 pl-2 whitespace-nowrap">
-          60 FPS | 960Hz
-        </span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <button id="btn-open-online-hud" type="button" title="Online Multiplayer Lobby" class="glass-panel px-3 py-1 rounded-xl text-[11px] font-semibold text-teal-300 border border-teal-500/40 hover:bg-slate-800 active:scale-95 transition shadow">
-          &#127760; Online
+        <button id="btn-open-settings-hud" type="button" title="Game Settings &amp; Sensitivities" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-slate-200 hover:bg-slate-800 active:scale-95 transition whitespace-nowrap">
+          &#9881; <span class="hidden sm:inline">Settings</span>
         </button>
-        <button id="btn-open-settings-hud" type="button" title="Game Settings &amp; Sensitivities" class="glass-panel px-3 py-1 rounded-xl text-[11px] font-semibold text-slate-200 hover:bg-slate-800 active:scale-95 transition shadow">
-          &#9881; Settings
-        </button>
-        <button id="btn-pause-menu" type="button" title="Game Menu" class="glass-panel px-3 py-1 rounded-xl text-[11px] font-semibold text-white bg-slate-800/90 hover:bg-slate-700 active:scale-95 transition shadow">
-          &#9776; Menu
+        <button id="btn-pause-menu" type="button" title="Game Menu" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-white bg-slate-800/90 hover:bg-slate-700 active:scale-95 transition whitespace-nowrap">
+          &#9776; <span class="hidden sm:inline">Menu</span>
         </button>
       </div>
-      <!-- ESC Mouse Cursor Status Pill -->
-      <div id="esc-cursor-pill" class="hidden glass-panel px-3.5 py-0.5 rounded-full border border-sky-400/50 text-[10px] font-semibold text-sky-200 shadow">
-        Mouse Cursor ON &mdash; Press <kbd class="px-1.5 py-0.2 bg-slate-800 rounded text-white font-mono">ESC</kbd> or Click Table to Lock Aim
+      <!-- ESC Mouse Cursor Status Pill (PC Only) -->
+      <div id="esc-cursor-pill" class="hidden glass-panel px-3 py-0.5 rounded-full border border-sky-400/50 text-[10px] font-semibold text-sky-200 shadow">
+        Mouse Cursor ON &mdash; Press <kbd class="px-1 py-0.2 bg-slate-800 rounded text-white font-mono">ESC</kbd> or Click Table to Lock Aim
       </div>
     </div>
 
     <!-- Player 2 / Bot Card -->
-    <div id="p2-card" class="glass-panel pointer-events-auto rounded-2xl px-3.5 py-2 min-w-[165px] sm:min-w-[225px] transition-all shadow-lg">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span id="p2-turn-dot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-          <div class="flex items-center gap-1.5">
-            <span id="p2-avatar-icon" class="text-xs text-sky-400 font-extrabold">&#129302;</span>
-            <span id="p2-name-label" class="font-bold text-xs sm:text-sm text-white truncate max-w-[90px]">Bot (Medium)</span>
-          </div>
+    <div id="p2-card" class="glass-panel pointer-events-auto rounded-2xl px-3 py-1.5 min-w-[148px] sm:min-w-[215px] transition-all shadow-lg">
+      <div class="flex items-center justify-between gap-1.5">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span id="p2-turn-dot" class="w-2.5 h-2.5 shrink-0 rounded-full bg-slate-600"></span>
+          <span id="p2-avatar-icon" class="text-xs text-sky-400 font-extrabold shrink-0">&#129302;</span>
+          <span id="p2-name-label" class="font-bold text-xs sm:text-sm text-white truncate max-w-[78px] sm:max-w-[100px]">Bot (Medium)</span>
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 shrink-0">
           <span id="p2-score-badge" title="Player 2 Match Wins" class="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">
             0 W
           </span>
           <span id="p2-bot-difficulty-badge" class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
             MED
           </span>
-          <span id="p2-group-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-800 text-slate-200 border border-slate-700/80">
+          <span id="p2-group-badge" class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-slate-800 text-slate-200 border border-slate-700/80">
             OPEN
           </span>
         </div>
       </div>
-      <div id="p2-balls-row" class="flex items-center gap-1 mt-1.5 min-h-[18px] flex-wrap"></div>
+      <div id="p2-balls-row" class="flex items-center gap-1 mt-1 min-h-[16px] flex-wrap"></div>
     </div>
   </header>
 
+  <!-- Faded Pop-Up Status Notification (Auto-Fades In & Out on Status Changes) -->
+  <div id="status-popup-toast" class="status-popup-fade fixed top-14 sm:top-16 left-1/2 z-30 pointer-events-none glass-panel px-4 py-1.5 rounded-full border border-emerald-400/35 shadow-xl max-w-[88vw]">
+    <span id="hud-status-banner" class="block text-[11px] sm:text-xs font-semibold text-emerald-200/95 truncate tracking-wide text-center">
+      Player 1 to Break (Breaker Cue) — Place Cue Ball Behind Line
+    </span>
+  </div>
+
   <!-- Live Online / Bot Reaction Toast -->
-  <div id="reaction-toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none glass-panel px-4 py-1.5 rounded-full border border-teal-400/60 text-xs font-bold text-white shadow-xl">
+  <div id="reaction-toast" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-30 pointer-events-none glass-panel px-4 py-1.5 rounded-full border border-teal-400/60 text-xs font-bold text-white shadow-xl">
     &#128079; Nice Shot!
   </div>
 
   <!-- Floating Ball-in-Hand / Break Placement Confirmation Banner -->
-  <div id="bih-confirm-bar" class="hidden fixed bottom-14 left-1/2 -translate-x-1/2 z-30 pointer-events-auto glass-panel rounded-2xl px-4 py-2.5 shadow-2xl border border-amber-400/70 items-center gap-3">
-    <div class="flex flex-col">
-      <span id="bih-title-text" class="text-xs font-extrabold text-amber-300 uppercase tracking-wide">Break Shot — Place Behind Head Line (Top View)</span>
-      <span id="bih-sub-text" class="text-[11px] text-slate-200">Move mouse or drag behind the white line, then Left-Click / Enter / Confirm</span>
+  <div id="bih-confirm-bar" class="hidden fixed bottom-12 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 pointer-events-auto glass-panel rounded-2xl px-3.5 py-2 shadow-2xl border border-amber-400/70 items-center gap-2.5 max-w-[78vw]">
+    <div class="flex flex-col min-w-0">
+      <span id="bih-title-text" class="text-[11px] sm:text-xs font-extrabold text-amber-300 uppercase tracking-wide truncate">Break Shot — Place Behind Line</span>
+      <span id="bih-sub-text" class="text-[10px] sm:text-[11px] text-slate-200 truncate">Drag cue ball behind white line, then tap Confirm Spot</span>
     </div>
-    <button id="btn-confirm-bih" type="button" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs shadow-lg border border-emerald-300/50 transition whitespace-nowrap">
+    <button id="btn-confirm-bih" type="button" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs shadow-lg border border-emerald-300/50 transition whitespace-nowrap shrink-0">
       &#10003; Confirm Spot
     </button>
   </div>
 
-  <!-- Left Thumb Control Dock: Cue Ball Spin (English), Fine Aim & Low POV Pitch (5°-45°) -->
-  <aside class="fixed left-2.5 bottom-2.5 z-20 flex flex-col gap-2 pointer-events-auto">
-    <!-- Spin Selector Card -->
-    <div id="spin-card-panel" class="glass-panel rounded-2xl p-2.5 flex flex-col items-center shadow-xl w-[122px] sm:w-[136px] transition-all">
+  <!-- Left Thumb Control Dock: Cue Ball Spin (Slid Down to Bottom-Left Corner; Fine Aim & Zoom Removed) -->
+  <aside class="safe-left-dock fixed z-20 flex flex-col gap-2 pointer-events-auto">
+    <div id="spin-card-panel" class="glass-panel rounded-2xl p-2.5 flex flex-col items-center shadow-xl w-[114px] sm:w-[132px] transition-all">
       <div class="w-full flex items-center justify-between text-[10px] text-slate-300 font-semibold mb-1">
         <span>CUE SPIN</span>
         <button id="btn-reset-spin" type="button" class="text-sky-400 hover:text-sky-300 underline">Center</button>
@@ -194,52 +250,25 @@
         <div class="absolute inset-2 rounded-full border border-dashed border-rose-400/60 pointer-events-none"></div>
         <div id="spin-reticle" class="w-3.5 h-3.5 rounded-full bg-rose-600 border-2 border-white shadow-md pointer-events-none transform translate-x-0 translate-y-0"></div>
       </div>
-      <div id="spin-readout" class="text-[10px] font-mono text-slate-300 mt-1 text-center">
+      <div id="spin-readout" class="text-[10px] font-mono text-slate-300 mt-1 text-center truncate w-full">
         Center Stun
-      </div>
-    </div>
-
-    <!-- Fine Aim, Low View Angle (5°-45°) & Camera Zoom Micro-Controls -->
-    <div class="glass-panel rounded-2xl p-2 flex flex-col gap-1.5 w-[122px] sm:w-[136px]">
-      <div class="text-[10px] font-semibold text-slate-400 text-center uppercase tracking-wider">Fine Aim &amp; View</div>
-      <div class="grid grid-cols-2 gap-1.5">
-        <button id="btn-aim-left" type="button" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-xs font-bold text-white border border-slate-600/60">
-          &#9664; -0.2&deg;
-        </button>
-        <button id="btn-aim-right" type="button" class="py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-xs font-bold text-white border border-slate-600/60">
-          +0.2&deg; &#9654;
-        </button>
-      </div>
-      <!-- Low POV Vertical Angle (5° to 45°) Quick Adjust -->
-      <div class="flex items-center justify-between bg-slate-900/90 rounded-lg px-1.5 py-1 border border-slate-700/80">
-        <button id="btn-pitch-down" type="button" title="Lower Vertical Angle (min 5°)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-emerald-300">&ndash;</button>
-        <span id="hud-pov-angle-label" class="text-[10px] font-mono font-bold text-slate-200">Angle 15&deg;</span>
-        <button id="btn-pitch-up" type="button" title="Raise Vertical Angle (max 45°)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-emerald-300">+</button>
-      </div>
-      <div class="grid grid-cols-2 gap-1.5">
-        <button id="btn-zoom-in" type="button" class="py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-[11px] font-medium text-slate-200 border border-slate-700">
-          Zoom +
-        </button>
-        <button id="btn-zoom-out" type="button" class="py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-[11px] font-medium text-slate-200 border border-slate-700">
-          Zoom -
-        </button>
       </div>
     </div>
   </aside>
 
   <!-- Right Thumb Control Dock: Dedicated Cue Pull-to-Shoot Slider with Breaker Cue Indicator -->
-  <aside class="fixed right-2.5 bottom-2.5 z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
-    <button id="btn-cancel-shot" type="button" class="glass-panel px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition">
+  <aside class="safe-right-dock fixed z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
+    <button id="btn-cancel-shot" type="button" class="glass-panel px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition">
       Reset Aim
     </button>
 
     <!-- Vertical Cue Pull-to-Shoot Slider Card -->
-    <div id="cue-slider-card" class="glass-panel rounded-2xl p-2.5 flex flex-col items-center shadow-xl">
+    <div id="cue-slider-card" class="glass-panel rounded-2xl p-2 flex flex-col items-center shadow-xl">
       <span id="cue-type-badge" class="text-[8px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded bg-rose-500/25 text-amber-300 border border-rose-500/50 mb-0.5">
         &#9889; BREAK CUE
       </span>
       <span class="text-[8px] text-slate-400 mb-1">Pull / Ctrl+Mouse</span>
-      <div id="power-slider-track" class="relative w-11 h-44 sm:h-52 rounded-xl bg-slate-900/95 border-2 border-amber-500/50 overflow-hidden cursor-ns-resize flex flex-col justify-end p-0.5 shadow-inner">
+      <div id="power-slider-track" class="relative w-10 sm:w-11 h-40 sm:h-52 rounded-xl bg-slate-900/95 border-2 border-amber-500/50 overflow-hidden cursor-ns-resize flex flex-col justify-end p-0.5 shadow-inner">
         <!-- Cancel Zone indicator at top -->
         <div class="absolute top-0 left-0 right-0 h-3.5 bg-slate-800/90 border-b border-slate-700 flex items-center justify-center pointer-events-none z-10">
           <span class="text-[7px] font-bold uppercase text-slate-400">Cancel &#9650;</span>
@@ -247,11 +276,11 @@
         <!-- Power Fill Bar -->
         <div id="power-fill" class="w-full rounded-lg power-rail-gradient transition-all duration-75 opacity-80" style="height: 0%;"></div>
         <!-- Visual 3D-Styled Cue Stick inside Slider -->
-        <div id="cue-slider-stick" class="absolute left-1/2 -translate-x-1/2 w-2 h-36 pointer-events-none flex flex-col items-center z-20" style="top: 6%;">
+        <div id="cue-slider-stick" class="absolute left-1/2 -translate-x-1/2 w-2 h-32 sm:h-36 pointer-events-none flex flex-col items-center z-20" style="top: 6%;">
           <!-- Blue Chalk Tip -->
           <div id="slider-cue-tip" class="w-2 h-1.5 bg-sky-400 rounded-t-sm border-b border-white"></div>
           <!-- Maple Shaft -->
-          <div id="slider-cue-shaft" class="w-2 h-20 bg-gradient-to-r from-amber-100 via-amber-200 to-amber-400"></div>
+          <div id="slider-cue-shaft" class="w-2 h-16 sm:h-20 bg-gradient-to-r from-amber-100 via-amber-200 to-amber-400"></div>
           <!-- Rosewood Butt -->
           <div id="slider-cue-butt" class="w-2.5 flex-1 bg-gradient-to-r from-amber-950 via-amber-900 to-stone-900 rounded-b"></div>
         </div>
@@ -264,7 +293,7 @@
   </aside>
 
   <!-- Pocketed Balls Tray (Bottom Center) -->
-  <div class="fixed bottom-2.5 left-1/2 -translate-x-1/2 z-10 pointer-events-none hidden sm:flex items-center gap-2 glass-panel px-3.5 py-1.5 rounded-full shadow-lg">
+  <div class="fixed bottom-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none hidden md:flex items-center gap-2 glass-panel px-3.5 py-1 rounded-full shadow-lg">
     <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Pocketed:</span>
     <div id="pocketed-tray" class="flex items-center gap-1 min-w-[120px] min-h-[16px]">
       <span class="text-[11px] text-slate-500 italic">None yet</span>
@@ -273,7 +302,7 @@
 
   <!-- Main Menu Modal -->
   <div id="main-menu-modal" class="fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-5">
-    <div class="glass-panel rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-700/80 max-h-[92vh] overflow-y-auto custom-scrollbar flex flex-col gap-4">
+    <div class="glass-panel rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-700/80 max-h-[92dvh] overflow-y-auto custom-scrollbar flex flex-col gap-4">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -409,9 +438,9 @@
     </div>
   </div>
 
-  <!-- Settings Modal: Includes Cue Slider Sensitivity (50% default), Mouse Look Sensitivity (5% default), and Low POV Angle (5°-45°) -->
+  <!-- Settings Modal: Includes Cue Slider Sensitivity (50% default), Mouse/Touch Aim Sensitivity (5% default), and Low POV Angle (5°-45°) -->
   <div id="settings-modal" class="hidden fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-slate-700/80 max-h-[92vh] overflow-y-auto custom-scrollbar">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-slate-700/80 max-h-[92dvh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-800">
         <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
           <span>&#9881;</span>
@@ -436,7 +465,7 @@
         <!-- 2. Mouse Look & Touch Aim Sensitivity (Defaults to 5%) -->
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label for="slider-aim-sens" class="block text-xs font-semibold text-sky-300">Mouse Look Sensitivity (Aim)</label>
+            <label for="slider-aim-sens" class="block text-xs font-semibold text-sky-300">Aim Sensitivity (Mouse &amp; Touch)</label>
             <span id="label-aim-sens" class="text-xs font-mono font-bold text-sky-300">5%</span>
           </div>
           <input id="slider-aim-sens" type="range" min="1" max="200" value="5" class="w-full accent-sky-500" />
@@ -493,10 +522,10 @@
       <!-- PC & Mobile Controls Quick Guide -->
       <div class="mb-3.5 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300 space-y-1">
         <div class="font-bold text-sky-300">PC &amp; Mobile Controls</div>
-        <div>&bull; <strong>Aim &amp; Pitch (PC):</strong> Move mouse horizontally to aim, vertically to tilt Low POV between <strong>5&deg;&ndash;45&deg;</strong>; press <strong>ESC</strong> to toggle cursor</div>
-        <div>&bull; <strong>Spin:</strong> Hold <strong>Left-Click + Move Mouse</strong> (PC) or use Spin Pad</div>
-        <div>&bull; <strong>Shoot:</strong> Hold <strong>Ctrl + Pull Mouse Back &amp; Push Forward</strong> (PC) or Pull Right Cue Slider</div>
-        <div>&bull; <strong>Post-Shot Free View:</strong> Camera stays in Free View after shooting (move mouse to look around; sensitivity lowered by 65%)</div>
+        <div>&bull; <strong>Aim &amp; Pitch:</strong> Drag on table (Mobile) or move mouse (PC) horizontally to aim, vertically to tilt Low POV (<strong>5&deg;&ndash;45&deg;</strong>); pinch with 2 fingers or scroll wheel to zoom</div>
+        <div>&bull; <strong>Spin:</strong> Drag the bottom-left <strong>CUE SPIN</strong> pad or Hold <strong>Left-Click + Move Mouse</strong> (PC)</div>
+        <div>&bull; <strong>Shoot:</strong> Pull the right <strong>Cue Slider</strong> down &amp; release, or Hold <strong>Ctrl + Pull Mouse Back &amp; Push Forward</strong> (PC)</div>
+        <div>&bull; <strong>Post-Shot Free View:</strong> Enters Free View after a <strong>1s delay</strong> following each shot (locks facing direction &amp; altitude; drag or move mouse to slide camera)</div>
       </div>
 
       <!-- Graphics Quality -->
@@ -570,7 +599,7 @@
 
   <!-- Online Multiplayer Lobby & Share Link Modal -->
   <div id="multiplayer-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-teal-500/40 max-h-[92vh] overflow-y-auto custom-scrollbar">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-teal-500/40 max-h-[92dvh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between mb-3">
         <div>
           <span class="text-[10px] font-bold uppercase tracking-widest text-teal-400">WebRTC TURN + Global WSS Cloud Relay</span>
@@ -644,7 +673,7 @@
 
   <!-- Automated Unit Test Suite Modal -->
   <div id="tests-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl max-w-2xl w-full p-5 shadow-2xl border border-slate-700 max-h-[90vh] flex flex-col">
+    <div class="glass-panel rounded-3xl max-w-2xl w-full p-5 shadow-2xl border border-slate-700 max-h-[90dvh] flex flex-col">
       <div class="flex items-center justify-between mb-3">
         <div>
           <h2 class="text-base sm:text-lg font-bold text-white">Automated Physics &amp; 8-Ball Rules Verification</h2>
@@ -1466,6 +1495,8 @@ class PhysicsWorld {
 
   /**
    * Clamps a candidate (x, z) into the playable bed bounds and checks if it avoids overlapping other balls.
+   * If slightly blocked by an object ball or pocket jaw during touch/mouse drag, searches nearby rings
+   * so the cue ball glides smoothly around obstacles.
    */
   clampCueBallPlacement(x, z, behindHeadStringOnly = false) {
     const R = BALL_RADIUS;
@@ -1480,6 +1511,20 @@ class PhysicsWorld {
 
     if (this.isValidCueBallPlacement(cx, cz, behindHeadStringOnly)) {
       return { x: cx, y: R, z: cz };
+    }
+
+    // Smoothly slide around nearby balls or pocket funnels
+    const step = R * 0.65;
+    for (let ring = 1; ring <= 5; ring++) {
+      const radius = ring * step;
+      for (let i = 0; i < 16; i++) {
+        const theta = (i / 16) * Math.PI * 2;
+        const nx = Math.max(minX, Math.min(maxX, cx + Math.cos(theta) * radius));
+        const nz = Math.max(minZ, Math.min(maxZ, cz + Math.sin(theta) * radius));
+        if (this.isValidCueBallPlacement(nx, nz, behindHeadStringOnly)) {
+          return { x: nx, y: R, z: nz };
+        }
+      }
     }
     return null;
   }
@@ -4384,6 +4429,40 @@ class CameraController {
   }
 
   /**
+   * Computes a dynamic aspect-ratio compensation factor so that on narrower or taller
+   * device screens (tablets, 4:3, 16:10, or portrait phones) the camera pulls back
+   * proportionally to keep the full billiard table and aiming lines in frame.
+   */
+  getAspectDistanceMultiplier() {
+    const aspect = Math.max(0.45, this.camera.aspect || 1.6);
+    if (aspect < 1.55) {
+      return Math.min(1.45, 1.55 / Math.max(0.75, aspect));
+    }
+    return 1.0;
+  }
+
+  /**
+   * Computes the exact overhead camera height required so the entire 9-ft billiard table
+   * (plus side margins for the left Spin box and right Cue Slider, and top/bottom HUD)
+   * fits dynamically inside the current device's viewport aspect ratio.
+   */
+  computeDynamicTopViewHeight(fovDeg) {
+    const aspect = Math.max(0.45, this.camera.aspect || 1.6);
+    const halfFovRad = (fovDeg * Math.PI) / 360;
+    const tanHalfV = Math.max(0.1, Math.tan(halfFovRad));
+    const tanHalfH = tanHalfV * aspect;
+
+    // Outer table cabinet is ~2.85m wide x 1.58m deep; include UI safe padding around rails
+    const targetSpanX = aspect < 1.2 ? 3.10 : 3.42;
+    const targetSpanZ = aspect > 2.0 ? 2.12 : 1.98;
+
+    const yForWidth = (targetSpanX * 0.5) / tanHalfH;
+    const yForHeight = (targetSpanZ * 0.5) / tanHalfV;
+
+    return Math.max(2.32, yForWidth, yForHeight);
+  }
+
+  /**
    * Initializes the Post-Shot Free View seamlessly at the player's current shot perspective
    * and locks the camera's facing direction (`freeViewYaw`), altitude (`freeViewAltitudeY`),
    * and horizontal look distance (`freeViewHorizDist`).
@@ -4391,7 +4470,7 @@ class CameraController {
   startPostShotFreeView(cuePos, aimAngleRad = 0) {
     const focusX = cuePos ? cuePos.x : this.currentLookAt.x;
     const focusZ = cuePos ? cuePos.z : this.currentLookAt.z;
-    const zoomScale = this.zoomDistance / 1.65;
+    const zoomScale = (this.zoomDistance / 1.65) * this.getAspectDistanceMultiplier();
 
     this.freeViewPanX = focusX;
     this.freeViewPanZ = focusZ;
@@ -4430,10 +4509,10 @@ class CameraController {
   }
 
   /**
-   * Post-Shot Free View mouse control (locked facing direction & locked altitude):
-   * - Horizontal mouse movement (`deltaHorizontalInput`) slides the camera left or right
+   * Post-Shot Free View mouse/touch control (locked facing direction & locked altitude):
+   * - Horizontal movement (`deltaHorizontalInput`) slides the camera left or right
    *   while keeping the camera facing the exact same direction.
-   * - Forward/backward mouse movement (`deltaVerticalInput`: negative when moving mouse forward)
+   * - Forward/backward movement (`deltaVerticalInput`: negative when moving forward)
    *   slides the camera forward or backward on the exact same altitude.
    */
   adjustFreeView(deltaHorizontalInput, deltaVerticalInput) {
@@ -4482,13 +4561,7 @@ class CameraController {
   }
 
   /**
-   * Updates camera position and lookTarget.
-   * - When `ballInHandTopView` is true, switches to an overhead top-down view for cue ball placement.
-   * - When `postShotFreeView` is true (after the player shoots), locks the camera's facing direction
-   *   and altitude (`freeViewAltitudeY`) while allowing smooth left/right and forward/backward sliding.
-   * - When `forceFullFrontView` is true (during opponent's turn), transitions smoothly
-   *   to a full front table view so the entire billiard table is visible.
-   * - When aiming in `pov` mode, uses `lowPovAngleDeg` (clamped 5° to 45°).
+   * Updates camera position and lookTarget dynamically for any device display ratio.
    */
   update(
     cuePos,
@@ -4519,8 +4592,9 @@ class CameraController {
     }
 
     if (ballInHandTopView) {
-      // Full-table overhead top-down view for effortless Ball-in-Hand placement
-      const targetPos = { x: 0, y: 2.38, z: 0.001 };
+      // Dynamic overhead top-down view that adapts to every device screen ratio so rails are never clipped
+      const dynamicY = this.computeDynamicTopViewHeight(desiredFov);
+      const targetPos = { x: 0, y: dynamicY, z: 0.001 };
       const lookTarget = { x: 0, y: BALL_RADIUS, z: 0 };
       const lerp = Math.min(1, dt * 10.0);
       this.camera.position.x += (targetPos.x - this.camera.position.x) * lerp;
@@ -4553,8 +4627,10 @@ class CameraController {
     }
 
     if (showFrontOverview) {
-      // Full Front Table View: elevated front-side broadcast view framing the entire 9-ft table during opponent's turn
-      const targetPos = { x: 0, y: 1.56, z: 1.74 };
+      // Full Front Table View: dynamically scaled for device aspect ratio so the full 9-ft table fits horizontally
+      const aspect = Math.max(0.45, this.camera.aspect || 1.6);
+      const frontScale = aspect < 1.75 ? Math.min(1.65, 1.75 / Math.max(0.75, aspect)) : 1.0;
+      const targetPos = { x: 0, y: 1.56 * frontScale, z: 1.74 * frontScale };
       const lookTarget = { x: 0, y: BALL_RADIUS, z: -0.04 };
       const posLerp = Math.min(1, dt * 7.5);
       const lookLerp = Math.min(1, dt * 9.5);
@@ -4572,15 +4648,16 @@ class CameraController {
     const focusY = BALL_RADIUS;
     const focusZ = cuePocketed ? 0 : cuePos.z;
 
-    const zoomScale = this.zoomDistance / 1.65;
-    let targetPos = { x: focusX, y: 2.25 * zoomScale, z: focusZ + 0.001 };
+    const zoomScale = (this.zoomDistance / 1.65) * this.getAspectDistanceMultiplier();
+    const dynamicTopY = this.computeDynamicTopViewHeight(desiredFov) * (this.zoomDistance / 0.85);
+    let targetPos = { x: focusX, y: dynamicTopY, z: focusZ + 0.001 };
     const lookTarget = { x: focusX, y: focusY, z: focusZ };
 
     if (this.mode === 'top') {
       const backOffset = 0.06 * zoomScale;
       targetPos = {
         x: focusX - Math.cos(aimAngleRad) * backOffset,
-        y: 2.25 * zoomScale,
+        y: dynamicTopY,
         z: focusZ - Math.sin(aimAngleRad) * backOffset
       };
     } else if (this.mode === 'pov') {
@@ -6096,8 +6173,11 @@ function runAllTests() {
       let strikeAnimTime = 0;
       let postShotFrontViewHoldTimer = 0;
       let postShotFreeViewActive = false;
+      let postShotFreeViewDelayTimer = 0;
       let portraitDismissed = false;
       let reactionToastTimeout = null;
+      let statusPopupTimeout = null;
+      let lastDisplayedStatusText = '';
 
       // Bot execution state machine
       let botPhase = 'idle'; // 'idle' | 'planning' | 'aiming' | 'pulling' | 'striking'
@@ -6136,6 +6216,36 @@ function runAllTests() {
       const testsModal = document.getElementById('tests-modal');
       const gameoverModal = document.getElementById('gameover-modal');
       const escCursorPill = document.getElementById('esc-cursor-pill');
+      const statusPopupToast = document.getElementById('status-popup-toast');
+      const hudStatusBanner = document.getElementById('hud-status-banner');
+
+      function isTouchDevice() {
+        return (
+          ('ontouchstart' in window) ||
+          (navigator.maxTouchPoints > 0) ||
+          (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+        );
+      }
+
+      // Unlock WebAudio & HTML5 Audio on first mobile touch gesture (for iOS Safari & Android Chrome on GitHub Pages)
+      window.addEventListener('touchstart', () => audio.unlock(), { passive: true, once: true });
+      window.addEventListener('touchend', () => audio.unlock(), { passive: true, once: true });
+
+      function showStatusPopup(text, durationMs = 2600, forceShow = false) {
+        if (!text) return;
+        if (!forceShow && text === lastDisplayedStatusText) return;
+        lastDisplayedStatusText = text;
+        if (hudStatusBanner) {
+          hudStatusBanner.textContent = text;
+        }
+        if (statusPopupToast) {
+          statusPopupToast.classList.add('show');
+          if (statusPopupTimeout) clearTimeout(statusPopupTimeout);
+          statusPopupTimeout = setTimeout(() => {
+            statusPopupToast.classList.remove('show');
+          }, durationMs);
+        }
+      }
 
       function isAnyModalOpen() {
         return (
@@ -6149,8 +6259,13 @@ function runAllTests() {
 
       function lockGameCursor() {
         cursorFreeMode = false;
-        document.body.classList.add('gameplay-cursor-hidden');
         if (escCursorPill) escCursorPill.classList.add('hidden');
+        // Never request desktop Pointer Lock or hide cursor on mobile/touch devices
+        if (isTouchDevice()) {
+          document.body.classList.remove('gameplay-cursor-hidden');
+          return;
+        }
+        document.body.classList.add('gameplay-cursor-hidden');
         try {
           if (document.pointerLockElement !== canvasEl && typeof canvasEl.requestPointerLock === 'function') {
             const req = canvasEl.requestPointerLock();
@@ -6163,7 +6278,7 @@ function runAllTests() {
         cursorFreeMode = keepFreeMode;
         document.body.classList.remove('gameplay-cursor-hidden');
         if (escCursorPill) {
-          if (keepFreeMode && !isAnyModalOpen()) {
+          if (keepFreeMode && !isAnyModalOpen() && !isTouchDevice()) {
             escCursorPill.classList.remove('hidden');
           } else {
             escCursorPill.classList.add('hidden');
@@ -6190,7 +6305,7 @@ function runAllTests() {
           }
           cursorFreeMode = true;
           document.body.classList.remove('gameplay-cursor-hidden');
-          if (escCursorPill && !isAnyModalOpen()) {
+          if (escCursorPill && !isAnyModalOpen() && !isTouchDevice()) {
             escCursorPill.classList.remove('hidden');
           }
         }
@@ -6198,6 +6313,7 @@ function runAllTests() {
 
       function showReactionToast(text) {
         const toast = document.getElementById('reaction-toast');
+        if (!toast) return;
         toast.textContent = text;
         toast.style.display = 'block';
         if (reactionToastTimeout) clearTimeout(reactionToastTimeout);
@@ -6414,25 +6530,32 @@ function runAllTests() {
           }
         },
         (statusText, isConn) => {
-          document.getElementById('mp-status-text').textContent = statusText;
+          const statusEl = document.getElementById('mp-status-text');
+          if (statusEl) statusEl.textContent = statusText;
           const badge = document.getElementById('mp-role-badge');
           const hudDot = document.getElementById('online-hud-dot');
           const onlineBtn = document.getElementById('btn-open-online-hud');
           if (!mp.active) {
-            badge.textContent = 'OFFLINE';
-            badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300';
-            hudDot.classList.add('hidden');
-            onlineBtn.textContent = '🌐 Online';
+            if (badge) {
+              badge.textContent = 'OFFLINE';
+              badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300';
+            }
+            if (hudDot) hudDot.classList.add('hidden');
+            if (onlineBtn) onlineBtn.textContent = '🌐 Online';
           } else if (isConn) {
-            badge.textContent = mp.role === 'host' ? 'HOST (P1)' : 'GUEST (P2)';
-            badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-            hudDot.classList.remove('hidden');
-            onlineBtn.textContent = '🟢 Room ' + mp.roomCode;
+            if (badge) {
+              badge.textContent = mp.role === 'host' ? 'HOST (P1)' : 'GUEST (P2)';
+              badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+            }
+            if (hudDot) hudDot.classList.remove('hidden');
+            if (onlineBtn) onlineBtn.textContent = '🟢 Room ' + mp.roomCode;
           } else {
-            badge.textContent = 'WAITING';
-            badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
-            hudDot.classList.remove('hidden');
-            onlineBtn.textContent = '🟡 Room ' + mp.roomCode;
+            if (badge) {
+              badge.textContent = 'WAITING';
+              badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            }
+            if (hudDot) hudDot.classList.remove('hidden');
+            if (onlineBtn) onlineBtn.textContent = '🟡 Room ' + mp.roomCode;
           }
           syncHUD();
         }
@@ -6496,7 +6619,7 @@ function runAllTests() {
         const spec = BALL_COLORS[id] || BALL_COLORS[0];
         const border = spec.isStripe ? 'border-2 border-white' : 'border border-black/40';
         const cursor = clickable ? 'cursor-pointer hover:scale-125 transition-transform' : '';
-        return '<span data-ball-id="' + id + '" title="Tap to aim at Ball ' + id + '" class="inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-extrabold text-white shadow ' + border + ' ' + cursor + '" style="background:' + spec.hex + '">' + id + '</span>';
+        return '<span data-ball-id="' + id + '" title="Tap to aim at Ball ' + id + '" class="inline-flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full text-[8px] sm:text-[9px] font-extrabold text-white shadow ' + border + ' ' + cursor + '" style="background:' + spec.hex + '">' + id + '</span>';
       }
 
       function updateCueTypeBadgeUI() {
@@ -6518,11 +6641,11 @@ function runAllTests() {
         if (tip && shaft && butt) {
           if (isBreak) {
             tip.className = 'w-2 h-1.5 bg-slate-900 rounded-t-sm border-b border-slate-400';
-            shaft.className = 'w-2 h-20 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900';
+            shaft.className = 'w-2 h-16 sm:h-20 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-900';
             butt.className = 'w-2.5 flex-1 bg-gradient-to-r from-sky-400 via-rose-700 to-slate-950 border-t-2 border-cyan-300 rounded-b';
           } else {
             tip.className = 'w-2 h-1.5 bg-amber-900 rounded-t-sm border-b border-amber-400';
-            shaft.className = 'w-2 h-20 bg-gradient-to-r from-stone-200 via-amber-100 to-stone-400';
+            shaft.className = 'w-2 h-16 sm:h-20 bg-gradient-to-r from-stone-200 via-amber-100 to-stone-400';
             butt.className = 'w-2.5 flex-1 bg-gradient-to-r from-stone-900 via-amber-950 to-stone-950 rounded-b';
           }
         }
@@ -6571,13 +6694,14 @@ function runAllTests() {
         const myTurn = isLocalControlAllowed();
         let bannerText = s.lastEventBanner;
         if (mp.active && mp.connected && !s.gameOver) {
-          bannerText = (myTurn ? '🟢 YOUR TURN: ' : '⏳ ' + rules.getCurrentPlayer().name.toUpperCase() + "'S TURN (Full Table View): ") + s.lastEventBanner;
+          bannerText = (myTurn ? '🟢 YOUR TURN: ' : '⏳ ' + rules.getCurrentPlayer().name.toUpperCase() + "'S TURN: ") + s.lastEventBanner;
         } else if (gameMode === 'bot' && !s.gameOver) {
           if (s.currentPlayerIndex === 1) {
-            bannerText = '🤖 ' + p2NameEl.textContent + ' is shooting (Full Table View)...';
+            bannerText = '🤖 ' + p2NameEl.textContent + ' is thinking & shooting...';
           }
         }
-        document.getElementById('hud-status-banner').textContent = bannerText;
+        // Trigger the faded pop-up status notification whenever status text changes
+        showStatusPopup(bannerText, 2700);
 
         const p1Card = document.getElementById('p1-card');
         const p2Card = document.getElementById('p2-card');
@@ -6587,26 +6711,26 @@ function runAllTests() {
         if (s.currentPlayerIndex === 0) {
           p1Card.classList.add('active-player-glow');
           p2Card.classList.remove('active-player-glow');
-          p1Dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
-          p2Dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-600';
+          p1Dot.className = 'w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse';
+          p2Dot.className = 'w-2.5 h-2.5 shrink-0 rounded-full bg-slate-600';
         } else {
           p2Card.classList.add('active-player-glow');
           p1Card.classList.remove('active-player-glow');
-          p2Dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
-          p1Dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-600';
+          p2Dot.className = 'w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse';
+          p1Dot.className = 'w-2.5 h-2.5 shrink-0 rounded-full bg-slate-600';
         }
 
-        const formatGroup = (g) => g ? (g === 'solids' ? 'SOLIDS (1-7)' : 'STRIPES (9-15)') : 'OPEN';
+        const formatGroup = (g) => g ? (g === 'solids' ? 'SOLIDS' : 'STRIPES') : 'OPEN';
         document.getElementById('p1-group-badge').textContent = gameMode === 'practice' && !p1.group ? 'PRACTICE' : formatGroup(p1.group);
-        document.getElementById('p2-group-badge').textContent = gameMode === 'practice' && !p2.group ? 'FREE PLAY' : formatGroup(p2.group);
+        document.getElementById('p2-group-badge').textContent = gameMode === 'practice' && !p2.group ? 'FREE' : formatGroup(p2.group);
 
         const renderPlayerTargets = (group) => {
           if (!group) {
-            return '<span class="text-[10px] text-slate-300">Pot any Solid (1-7) or Stripe (9-15)</span>';
+            return '<span class="text-[9px] sm:text-[10px] text-slate-300 truncate">Pot Solid (1-7) or Stripe (9-15)</span>';
           }
           const rem = rules.getRemainingBallsForGroup(group);
           if (rem.length === 0) {
-            return createBallDotHTML(8, true) + '<span class="text-[10px] text-amber-300 font-semibold ml-1">Pot 8-Ball to Win!</span>';
+            return createBallDotHTML(8, true) + '<span class="text-[9px] sm:text-[10px] text-amber-300 font-semibold ml-1">Pot 8-Ball!</span>';
           }
           return rem.map((id) => createBallDotHTML(id, true)).join('');
         };
@@ -6629,16 +6753,16 @@ function runAllTests() {
           sliderCard.classList.add('opacity-40', 'pointer-events-none');
           if (myTurn) {
             if (s.behindHeadStringOnly) {
-              document.getElementById('bih-title-text').textContent = 'Break Shot (Breaker Cue) — Place Behind Head Line';
-              document.getElementById('bih-sub-text').textContent = 'Move mouse or drag behind the white line, then Left-Click / Enter / Confirm';
+              document.getElementById('bih-title-text').textContent = 'Break Shot (Breaker Cue) — Place Behind Line';
+              document.getElementById('bih-sub-text').textContent = 'Drag or move cue ball behind white line, then Confirm Spot';
             } else {
               document.getElementById('bih-title-text').textContent = 'Ball-in-Hand (Top View)';
-              document.getElementById('bih-sub-text').textContent = 'Move mouse or drag anywhere on the table, then Left-Click / Enter / Confirm';
+              document.getElementById('bih-sub-text').textContent = 'Drag or move cue ball anywhere on table, then Confirm Spot';
             }
             confirmBtn.style.display = 'inline-block';
           } else {
             document.getElementById('bih-title-text').textContent = rules.getCurrentPlayer().name + (s.behindHeadStringOnly ? ' Placing Break Ball' : ' has Ball-in-Hand');
-            document.getElementById('bih-sub-text').textContent = 'Watching opponent place the white ball (Full Front View)...';
+            document.getElementById('bih-sub-text').textContent = 'Watching opponent place the white ball...';
             confirmBtn.style.display = 'none';
           }
         } else {
@@ -6656,10 +6780,12 @@ function runAllTests() {
         const allPocketed = [...s.pocketedSolids, ...s.pocketedStripes];
         if (s.eightBallPocketed) allPocketed.push(8);
         const tray = document.getElementById('pocketed-tray');
-        if (allPocketed.length === 0) {
-          tray.innerHTML = '<span class="text-[11px] text-slate-500 italic">None yet</span>';
-        } else {
-          tray.innerHTML = allPocketed.map((id) => createBallDotHTML(id, false)).join('');
+        if (tray) {
+          if (allPocketed.length === 0) {
+            tray.innerHTML = '<span class="text-[11px] text-slate-500 italic">None yet</span>';
+          } else {
+            tray.innerHTML = allPocketed.map((id) => createBallDotHTML(id, false)).join('');
+          }
         }
       }
 
@@ -6707,9 +6833,10 @@ function runAllTests() {
 
       function updateSpinUI() {
         const reticle = document.getElementById('spin-reticle');
-        const maxPx = 22;
-        const tx = shot.spin.x * maxPx;
-        const ty = -shot.spin.y * maxPx;
+        const spinPadEl = document.getElementById('spin-pad');
+        const padRadius = spinPadEl ? spinPadEl.clientWidth * 0.34 : 22;
+        const tx = shot.spin.x * padRadius;
+        const ty = -shot.spin.y * padRadius;
         reticle.style.transform = 'translate(' + tx.toFixed(1) + 'px, ' + ty.toFixed(1) + 'px)';
 
         const parts = [];
@@ -6834,13 +6961,15 @@ function runAllTests() {
       document.getElementById('btn-set-diff-med').addEventListener('click', () => { audio.playUIClick(); setBotDifficulty('medium'); });
       document.getElementById('btn-set-diff-hard').addEventListener('click', () => { audio.playUIClick(); setBotDifficulty('hard'); });
 
-      // 3D Viewport Pointer, Mouse & Touch Controls
+      // 3D Viewport Pointer, Mouse & Multi-Touch (1-Finger Aim / BIH + 2-Finger Pinch-to-Zoom) Controls
       let draggingCanvas = false;
       let draggingCueBall = false;
       let lastPointerX = 0;
       let lastPointerY = 0;
       let hasPointerPos = false;
       let totalDragDist = 0;
+      const activeTouchPointers = new Map();
+      let lastPinchDist = 0;
 
       const spinCardPanel = document.getElementById('spin-card-panel');
 
@@ -6859,7 +6988,19 @@ function runAllTests() {
 
       canvasEl.addEventListener('pointerdown', (e) => {
         audio.unlock();
-        if (!isLocalControlAllowed() || isAnyModalOpen()) return;
+        if (isAnyModalOpen()) return;
+
+        if (e.pointerType !== 'mouse') {
+          activeTouchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (activeTouchPointers.size === 2) {
+            const pts = Array.from(activeTouchPointers.values());
+            lastPinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+            draggingCanvas = false;
+            return;
+          }
+        }
+
+        if (!isLocalControlAllowed()) return;
 
         if (e.pointerType === 'mouse' && (cursorFreeMode || document.pointerLockElement !== canvasEl)) {
           lockGameCursor();
@@ -6896,7 +7037,33 @@ function runAllTests() {
       });
 
       canvasEl.addEventListener('pointermove', (e) => {
-        if (!isLocalControlAllowed() || isAnyModalOpen()) return;
+        if (isAnyModalOpen()) return;
+
+        // Handle 2-Finger Pinch-to-Zoom on Mobile Touchscreens
+        if (e.pointerType !== 'mouse' && activeTouchPointers.has(e.pointerId)) {
+          activeTouchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (activeTouchPointers.size >= 2) {
+            const pts = Array.from(activeTouchPointers.values());
+            const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+            if (lastPinchDist > 10) {
+              const deltaPinch = (lastPinchDist - dist) * 0.0045;
+              if (sceneManager.cameraController.isPostShotFreeViewActive) {
+                if (postShotFreeViewDelayTimer <= 0) {
+                  sceneManager.cameraController.panFreeView(0, -deltaPinch * 0.65);
+                }
+              } else {
+                sceneManager.cameraController.zoomDistance = Math.max(
+                  0.50,
+                  Math.min(3.40, sceneManager.cameraController.zoomDistance + deltaPinch)
+                );
+              }
+            }
+            lastPinchDist = dist;
+            return;
+          }
+        }
+
+        if (!isLocalControlAllowed()) return;
         if (e.pointerType === 'mouse' && cursorFreeMode && !draggingCanvas) return;
 
         const isLocked = document.pointerLockElement === canvasEl;
@@ -6956,8 +7123,11 @@ function runAllTests() {
           return;
         }
 
-        // #1: When the player in turn has just shot, lock camera facing direction & altitude and slide left/right/forward/back (sensitivity lowered by another 50%)
+        // #1: When the player in turn has just shot, wait 1s before entering interactive Free View, then slide left/right/forward/back at locked direction & altitude
         if ((!world.areAllBallsStationary() || postShotFrontViewHoldTimer > 0) && postShotFreeViewActive && !rules.state.gameOver) {
+          if (postShotFreeViewDelayTimer > 0) {
+            return;
+          }
           if (e.pointerType === 'mouse') {
             if ((e.buttons & 2) === 2) {
               sceneManager.cameraController.panFreeView(dx * 0.00049, -dy * 0.00049);
@@ -6965,7 +7135,7 @@ function runAllTests() {
               sceneManager.cameraController.adjustFreeView(dx * 0.0009625, dy * 0.0007875);
             }
           } else if (draggingCanvas) {
-            sceneManager.cameraController.adjustFreeView(dx * 0.0009625, dy * 0.0007875);
+            sceneManager.cameraController.adjustFreeView(dx * 0.0018, dy * 0.0015);
           }
           return;
         }
@@ -7028,9 +7198,11 @@ function runAllTests() {
             }
           }
         } else if (draggingCanvas) {
-          shot.adjustAim(dx * 0.0042 * aimSens);
+          // Mobile Touch Aiming: normalized around the 5% default so 1-finger touch drag is smooth and responsive on GitHub Pages
+          const touchSensScale = aimSens / 0.05;
+          shot.adjustAim(dx * 0.0052 * touchSensScale);
           if (Math.abs(dy) > 0 && sceneManager.cameraController.mode === 'pov') {
-            sceneManager.cameraController.adjustLowPovAngle(dy * 0.45 * aimSens);
+            sceneManager.cameraController.adjustLowPovAngle(dy * 0.085 * touchSensScale);
             syncPovAngleUI();
           }
           if (mp.active && mp.connected) {
@@ -7040,8 +7212,19 @@ function runAllTests() {
       });
 
       const stopCanvasDrag = (e) => {
+        if (e && e.pointerType !== 'mouse') {
+          activeTouchPointers.delete(e.pointerId);
+          if (activeTouchPointers.size < 2) {
+            lastPinchDist = 0;
+          }
+          if (activeTouchPointers.size === 1) {
+            const remPt = Array.from(activeTouchPointers.values())[0];
+            lastPointerX = remPt.x;
+            lastPointerY = remPt.y;
+          }
+        }
         spinCardPanel.classList.remove('active-player-glow');
-        if (draggingCanvas && totalDragDist < 6 && world.areAllBallsStationary() && !strikeAnimActive && e && isLocalControlAllowed()) {
+        if (draggingCanvas && totalDragDist < 8 && world.areAllBallsStationary() && !strikeAnimActive && e && isLocalControlAllowed()) {
           if (rules.state.ballInHand) {
             if (e.pointerType === 'mouse' && !cursorFreeMode) {
               confirmBallInHandSpot();
@@ -7065,7 +7248,7 @@ function runAllTests() {
               let tappedBall = null;
               for (const b of world.balls) {
                 if (b.id === 0 || b.pocketed) continue;
-                if (Math.hypot(pt.x - b.position.x, pt.z - b.position.z) < BALL_RADIUS * 2.2) {
+                if (Math.hypot(pt.x - b.position.x, pt.z - b.position.z) < BALL_RADIUS * 2.5) {
                   tappedBall = b;
                   break;
                 }
@@ -7110,7 +7293,7 @@ function runAllTests() {
         audio.unlock();
         if (!isLocalControlAllowed()) return;
         draggingSpin = true;
-        spinPad.setPointerCapture(e.pointerId);
+        try { spinPad.setPointerCapture(e.pointerId); } catch {}
         updateSpinFromEvent(e);
       });
       spinPad.addEventListener('pointermove', (e) => {
@@ -7157,7 +7340,7 @@ function runAllTests() {
         if (!world.areAllBallsStationary() || strikeAnimActive || rules.state.gameOver || rules.state.ballInHand) return;
         draggingPower = true;
         isPullingCueSlider = true;
-        powerTrack.setPointerCapture(e.pointerId);
+        try { powerTrack.setPointerCapture(e.pointerId); } catch {}
         updatePowerFromEvent(e, true);
       });
 
@@ -7198,52 +7381,73 @@ function runAllTests() {
         aimAtNearestLegalBall();
       });
 
-      document.getElementById('btn-aim-left').addEventListener('click', () => {
-        if (!isLocalControlAllowed()) return;
-        audio.playUIClick();
-        shot.adjustAim(-0.0035);
-        if (mp.active && mp.connected) {
-          mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
-        }
-      });
+      // Optional micro-control button listeners (null-safe since Fine Aim & Zoom dock was removed from HUD)
+      const btnAimLeft = document.getElementById('btn-aim-left');
+      if (btnAimLeft) {
+        btnAimLeft.addEventListener('click', () => {
+          if (!isLocalControlAllowed()) return;
+          audio.playUIClick();
+          shot.adjustAim(-0.0035);
+          if (mp.active && mp.connected) {
+            mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
+          }
+        });
+      }
 
-      document.getElementById('btn-aim-right').addEventListener('click', () => {
-        if (!isLocalControlAllowed()) return;
-        audio.playUIClick();
-        shot.adjustAim(0.0035);
-        if (mp.active && mp.connected) {
-          mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
-        }
-      });
+      const btnAimRight = document.getElementById('btn-aim-right');
+      if (btnAimRight) {
+        btnAimRight.addEventListener('click', () => {
+          if (!isLocalControlAllowed()) return;
+          audio.playUIClick();
+          shot.adjustAim(0.0035);
+          if (mp.active && mp.connected) {
+            mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
+          }
+        });
+      }
 
-      document.getElementById('btn-pitch-down').addEventListener('click', () => {
-        audio.playUIClick();
-        sceneManager.cameraController.adjustLowPovAngle(-3);
-        syncPovAngleUI();
-      });
+      const btnPitchDown = document.getElementById('btn-pitch-down');
+      if (btnPitchDown) {
+        btnPitchDown.addEventListener('click', () => {
+          audio.playUIClick();
+          sceneManager.cameraController.adjustLowPovAngle(-3);
+          syncPovAngleUI();
+        });
+      }
 
-      document.getElementById('btn-pitch-up').addEventListener('click', () => {
-        audio.playUIClick();
-        sceneManager.cameraController.adjustLowPovAngle(3);
-        syncPovAngleUI();
-      });
+      const btnPitchUp = document.getElementById('btn-pitch-up');
+      if (btnPitchUp) {
+        btnPitchUp.addEventListener('click', () => {
+          audio.playUIClick();
+          sceneManager.cameraController.adjustLowPovAngle(3);
+          syncPovAngleUI();
+        });
+      }
 
-      document.getElementById('btn-zoom-in').addEventListener('click', () => {
-        audio.playUIClick();
-        sceneManager.cameraController.zoomDistance = Math.max(0.50, sceneManager.cameraController.zoomDistance - 0.16);
-      });
+      const btnZoomIn = document.getElementById('btn-zoom-in');
+      if (btnZoomIn) {
+        btnZoomIn.addEventListener('click', () => {
+          audio.playUIClick();
+          sceneManager.cameraController.zoomDistance = Math.max(0.50, sceneManager.cameraController.zoomDistance - 0.16);
+        });
+      }
 
-      document.getElementById('btn-zoom-out').addEventListener('click', () => {
-        audio.playUIClick();
-        sceneManager.cameraController.zoomDistance = Math.min(3.40, sceneManager.cameraController.zoomDistance + 0.16);
-      });
+      const btnZoomOut = document.getElementById('btn-zoom-out');
+      if (btnZoomOut) {
+        btnZoomOut.addEventListener('click', () => {
+          audio.playUIClick();
+          sceneManager.cameraController.zoomDistance = Math.min(3.40, sceneManager.cameraController.zoomDistance + 0.16);
+        });
+      }
 
       canvasEl.addEventListener('wheel', (e) => {
         if (isAnyModalOpen()) return;
         e.preventDefault();
         const delta = Math.sign(e.deltaY) * 0.10;
         if (sceneManager.cameraController.isPostShotFreeViewActive) {
-          sceneManager.cameraController.panFreeView(0, -delta * 0.45);
+          if (postShotFreeViewDelayTimer <= 0) {
+            sceneManager.cameraController.panFreeView(0, -delta * 0.45);
+          }
         } else {
           sceneManager.cameraController.zoomDistance = Math.max(0.50, Math.min(3.40, sceneManager.cameraController.zoomDistance + delta));
         }
@@ -7257,7 +7461,8 @@ function runAllTests() {
       }
 
       document.getElementById('btn-open-multiplayer').addEventListener('click', openMultiplayerLobby);
-      document.getElementById('btn-open-online-hud').addEventListener('click', openMultiplayerLobby);
+      const btnOpenOnlineHud = document.getElementById('btn-open-online-hud');
+      if (btnOpenOnlineHud) btnOpenOnlineHud.addEventListener('click', openMultiplayerLobby);
       document.getElementById('btn-close-multiplayer').addEventListener('click', () => {
         audio.playUIClick();
         multiplayerModal.style.display = 'none';
@@ -7391,6 +7596,8 @@ function runAllTests() {
         gameMode = mode;
         botPhase = 'idle';
         botTimer = 0;
+        postShotFreeViewActive = false;
+        postShotFreeViewDelayTimer = 0;
 
         if (forceUnguided !== null) {
           unguidedMode = forceUnguided;
@@ -7435,6 +7642,7 @@ function runAllTests() {
         shot.resetSpin();
         updatePowerUI();
         updateSpinUI();
+        lastDisplayedStatusText = '';
         syncHUD();
         mainMenuModal.style.display = 'none';
         gameoverModal.style.display = 'none';
@@ -7472,6 +7680,7 @@ function runAllTests() {
         audio.playUIClick();
         mainMenuModal.style.display = 'none';
         lockGameCursor();
+        showStatusPopup(rules.state.lastEventBanner, 2500, true);
       });
 
       document.getElementById('btn-pause-menu').addEventListener('click', () => {
@@ -7635,19 +7844,27 @@ function runAllTests() {
         if (!isAnyModalOpen()) lockGameCursor();
       });
 
-      // Orientation & Resize Handling
+      // Dynamic Device Display Ratio & Viewport Resize Handling (Supports visualViewport & orientationchange)
       function handleResize() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+        const vv = window.visualViewport;
+        const w = vv ? vv.width : window.innerWidth;
+        const h = vv ? vv.height : window.innerHeight;
         sceneManager.resize(w, h);
+        updateSpinUI();
         const portraitOverlay = document.getElementById('portrait-overlay');
-        if (h > w * 1.15 && w < 520 && !portraitDismissed) {
+        if (h > w * 1.15 && w < 560 && !portraitDismissed) {
           portraitOverlay.style.display = 'flex';
         } else {
           portraitOverlay.style.display = 'none';
         }
       }
       window.addEventListener('resize', handleResize);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(handleResize, 120);
+      });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handleResize);
+      }
       document.getElementById('btn-dismiss-portrait').addEventListener('click', () => {
         portraitDismissed = true;
         document.getElementById('portrait-overlay').style.display = 'none';
@@ -7728,6 +7945,8 @@ function runAllTests() {
         spaceTopViewHeld = false;
         ctrlKeyHeld = false;
         ctrlPeakPower = 0.0;
+        activeTouchPointers.clear();
+        lastPinchDist = 0;
         if (!draggingPower && isPullingCueSlider) {
           isPullingCueSlider = false;
           shot.powerNorm = 0.0;
@@ -7754,22 +7973,11 @@ function runAllTests() {
 
       // Main 60FPS Render & 960Hz Physics Loop
       let lastTime = performance.now();
-      let fpsFrames = 0;
-      let fpsTimer = 0;
 
       function animate(now) {
         requestAnimationFrame(animate);
         const dt = Math.min(0.1, Math.max(0.001, (now - lastTime) / 1000));
         lastTime = now;
-
-        fpsFrames++;
-        fpsTimer += dt;
-        if (fpsTimer >= 0.5) {
-          const fps = Math.round(fpsFrames / fpsTimer);
-          document.getElementById('hud-fps-badge').textContent = fps + ' FPS | 960Hz';
-          fpsFrames = 0;
-          fpsTimer = 0;
-        }
 
         // Handle Cue Stick Pull-Back & Forward Strike Animation
         let pullOffset = isPullingCueSlider ? shot.powerNorm * 0.25 : 0.014;
@@ -7795,10 +8003,11 @@ function runAllTests() {
             postShotFrontViewHoldTimer = 0.45;
             if (isLocalControlAllowed()) {
               postShotFreeViewActive = true;
+              postShotFreeViewDelayTimer = 1.0;
               sceneManager.cameraController.startPostShotFreeView(world.getCueBall().position, shot.aimAngleRad);
-              document.getElementById('hud-status-banner').textContent = '🎥 Free View Active — Move Mouse to Slide Left/Right/Forward at Locked Direction & Altitude';
             } else {
               postShotFreeViewActive = false;
+              postShotFreeViewDelayTimer = 0;
             }
           }
         }
@@ -7809,6 +8018,12 @@ function runAllTests() {
         CollisionAudio.processTelemetryAudio(world.shotTelemetry, audio);
 
         const movingNow = !world.areAllBallsStationary();
+        if (postShotFreeViewActive && postShotFreeViewDelayTimer > 0) {
+          postShotFreeViewDelayTimer = Math.max(0, postShotFreeViewDelayTimer - dt);
+          if (postShotFreeViewDelayTimer === 0 && (movingNow || postShotFrontViewHoldTimer > 0) && !rules.state.gameOver) {
+            showStatusPopup('🎥 Free View Active — Drag or Move Mouse to Slide Camera', 2200, true);
+          }
+        }
         if (!movingNow && postShotFrontViewHoldTimer > 0) {
           postShotFrontViewHoldTimer = Math.max(0, postShotFrontViewHoldTimer - dt);
         }
@@ -7926,11 +8141,10 @@ function runAllTests() {
           rules.state.isBreakShot
         );
 
-        // #8 & #11: Automatically switch to Full Front Table View:
-        // (a) Right after the player in turn shoots while balls are rolling across the table, OR
-        // (b) Whenever it is the other player's turn (Bot turn or Online Opponent turn)
+        // Automatically switch to Full Front Table View on Opponent's Turn, or Free View after 1s delay on Player's Shot
         if (!movingNow && postShotFrontViewHoldTimer <= 0 && postShotFreeViewActive) {
           postShotFreeViewActive = false;
+          postShotFreeViewDelayTimer = 0;
         }
         const otherPlayerTurn = !isLocalControlAllowed();
         const ballInHandTopView = ((rules.state.ballInHand && !otherPlayerTurn) || spaceTopViewHeld) && !movingNow && !rules.state.gameOver;
