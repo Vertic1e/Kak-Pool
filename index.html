@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Pro 3D 8-Ball Pool Club — PC &amp; Mobile Billiards</title>
+  <title>Pro 3D 8-Ball &amp; 9-Ball Pool Club — PC &amp; Mobile Billiards</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -52,7 +52,7 @@
       cursor: none !important;
     }
     .glass-panel {
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.84);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(148, 163, 184, 0.16);
@@ -75,20 +75,24 @@
       transform: translate(-50%, 0) scale(1);
     }
     /* Safe-area & Dynamic Mobile Landscape / Compact Display Ratio Adjustments */
+    /* Raised Spin Box & Cue Slider so they never touch the bottom edge */
     .safe-top-hud {
       padding-top: max(0.5rem, env(safe-area-inset-top));
       padding-left: max(0.65rem, env(safe-area-inset-left));
       padding-right: max(0.65rem, env(safe-area-inset-right));
     }
     .safe-left-dock {
-      left: max(0.6rem, env(safe-area-inset-left));
-      bottom: max(0.6rem, env(safe-area-inset-bottom));
+      left: max(0.75rem, env(safe-area-inset-left));
+      bottom: calc(max(1.85rem, env(safe-area-inset-bottom)) + 1.15rem);
     }
     .safe-right-dock {
-      right: max(0.6rem, env(safe-area-inset-right));
-      bottom: max(0.6rem, env(safe-area-inset-bottom));
+      right: max(0.75rem, env(safe-area-inset-right));
+      bottom: calc(max(1.85rem, env(safe-area-inset-bottom)) + 1.15rem);
     }
     @media (max-height: 520px), (max-width: 740px) {
+      .safe-left-dock, .safe-right-dock {
+        bottom: calc(max(1.45rem, env(safe-area-inset-bottom)) + 0.9rem) !important;
+      }
       #p1-card, #p2-card {
         min-width: 132px !important;
         max-width: 37vw !important;
@@ -111,7 +115,7 @@
         height: 6.5rem !important;
       }
       #bih-confirm-bar {
-        bottom: 0.55rem !important;
+        bottom: 1.65rem !important;
         padding: 0.4rem 0.7rem !important;
         max-width: 66vw !important;
       }
@@ -169,10 +173,13 @@
       <div id="p1-balls-row" class="flex items-center gap-1 mt-1 min-h-[16px] flex-wrap"></div>
     </div>
 
-    <!-- Compact Center Scoreboard & Quick Menu Buttons (No Online Tag or Cluttered Permanent Instruction Banner) -->
+    <!-- Compact Center Scoreboard & Quick Menu Buttons -->
     <div class="flex flex-col items-center gap-1 pointer-events-auto shrink-0">
       <div class="glass-panel rounded-full px-2.5 py-1 flex items-center gap-1.5 sm:gap-2 shadow-xl border border-slate-700/60">
         <span id="online-hud-dot" class="hidden w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="hud-mode-pill" class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[10px] font-mono font-extrabold text-emerald-300 whitespace-nowrap">
+          8-BALL
+        </span>
         <span id="hud-score-pill" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-[11px] font-mono font-extrabold text-amber-300 whitespace-nowrap">
           &#127942; 0 &ndash; 0
         </span>
@@ -226,7 +233,7 @@
   </div>
 
   <!-- Floating Ball-in-Hand / Break Placement Confirmation Banner -->
-  <div id="bih-confirm-bar" class="hidden fixed bottom-12 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 pointer-events-auto glass-panel rounded-2xl px-3.5 py-2 shadow-2xl border border-amber-400/70 items-center gap-2.5 max-w-[78vw]">
+  <div id="bih-confirm-bar" class="hidden fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-auto glass-panel rounded-2xl px-3.5 py-2 shadow-2xl border border-amber-400/70 items-center gap-2.5 max-w-[78vw]">
     <div class="flex flex-col min-w-0">
       <span id="bih-title-text" class="text-[11px] sm:text-xs font-extrabold text-amber-300 uppercase tracking-wide truncate">Break Shot — Place Behind Line</span>
       <span id="bih-sub-text" class="text-[10px] sm:text-[11px] text-slate-200 truncate">Drag cue ball behind white line, then tap Confirm Spot</span>
@@ -236,7 +243,7 @@
     </button>
   </div>
 
-  <!-- Left Thumb Control Dock: Cue Ball Spin (Slid Down to Bottom-Left Corner; Fine Aim & Zoom Removed) -->
+  <!-- Left Thumb Control Dock: Cue Ball Spin (Raised above bottom edge) -->
   <aside class="safe-left-dock fixed z-20 flex flex-col gap-2 pointer-events-auto">
     <div id="spin-card-panel" class="glass-panel rounded-2xl p-2.5 flex flex-col items-center shadow-xl w-[114px] sm:w-[132px] transition-all">
       <div class="w-full flex items-center justify-between text-[10px] text-slate-300 font-semibold mb-1">
@@ -256,7 +263,7 @@
     </div>
   </aside>
 
-  <!-- Right Thumb Control Dock: Dedicated Cue Pull-to-Shoot Slider with Breaker Cue Indicator -->
+  <!-- Right Thumb Control Dock: Dedicated Cue Pull-to-Shoot Slider (Raised above bottom edge) -->
   <aside class="safe-right-dock fixed z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
     <button id="btn-cancel-shot" type="button" class="glass-panel px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-semibold text-slate-300 hover:text-white hover:bg-slate-800 active:scale-95 transition">
       Reset Aim
@@ -293,48 +300,173 @@
   </aside>
 
   <!-- Pocketed Balls Tray (Bottom Center) -->
-  <div class="fixed bottom-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none hidden md:flex items-center gap-2 glass-panel px-3.5 py-1 rounded-full shadow-lg">
+  <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none hidden md:flex items-center gap-2 glass-panel px-3.5 py-1 rounded-full shadow-lg">
     <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Pocketed:</span>
     <div id="pocketed-tray" class="flex items-center gap-1 min-w-[120px] min-h-[16px]">
       <span class="text-[11px] text-slate-500 italic">None yet</span>
     </div>
   </div>
 
-  <!-- Main Menu Modal -->
+  <!-- ========================================================================= -->
+  <!-- RE-DESIGNED 3-STEP MAIN MENU MODAL                                        -->
+  <!-- Step 1: Play, Setting                                                     -->
+  <!-- Step 2: Online, 1v1 Local, vs Bot, Practice Solo                          -->
+  <!-- Step 3: Table Selection, Environment, Game Mode (8/9 Ball), Ball Set, Bot -->
+  <!-- ========================================================================= -->
   <div id="main-menu-modal" class="fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-5">
-    <div class="glass-panel rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-700/80 max-h-[92dvh] overflow-y-auto custom-scrollbar flex flex-col gap-4">
-      
+    <div class="glass-panel rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-700/80 max-h-[92dvh] overflow-y-auto custom-scrollbar flex flex-col gap-4">
+
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-800">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-xl shadow-lg border border-emerald-400/40">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-2xl shadow-lg border border-emerald-400/40">
             &#127921;
           </div>
           <div>
-            <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Pro 3D 8-Ball Pool Club</h1>
-            <span class="text-[11px] text-emerald-400 font-medium">960Hz Physics &bull; Breaker Cue &bull; P2P Multiplayer</span>
+            <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Pro 3D Pool Club</h1>
+            <span class="text-[11px] text-emerald-400 font-medium">8-Ball &amp; 9-Ball &bull; Custom Ball Sets &bull; P2P Online</span>
           </div>
         </div>
         <button id="btn-resume-game" type="button" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 active:scale-95 transition">
-          Resume
+          Resume Table
         </button>
       </div>
 
-      <!-- Mode 1: Solo vs Bot AI -->
-      <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 shadow-lg flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-base text-emerald-400 font-bold">&#129302;</span>
-            <span class="text-sm font-bold text-white">Play Solo vs Bot AI</span>
+      <!-- ===================================================================== -->
+      <!-- MENU STEP 1: PLAY & SETTING                                           -->
+      <!-- ===================================================================== -->
+      <div id="menu-step-1" class="flex flex-col gap-4 py-2">
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900/95 via-slate-900/80 to-emerald-950/40 border border-emerald-500/30 text-center flex flex-col items-center gap-2 shadow-inner">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold tracking-wide uppercase">
+            <span>&#9733;</span>
+            <span>960Hz Tournament Physics Engine</span>
           </div>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold">
-            SOLO MATCH
-          </span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white mt-1">Welcome to the Billiards Lounge</h2>
+          <p class="text-xs text-slate-300 max-w-md leading-relaxed">
+            Experience regulation 8-Ball &amp; 9-Ball billiards with custom ball styles, luxury club environments, AI bots, and live cross-network multiplayer.
+          </p>
         </div>
-        
-        <div>
-          <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-            <span>Select Bot Difficulty:</span>
+
+        <button id="btn-menu-play" type="button" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold text-base sm:text-lg shadow-xl border border-emerald-400/50 active:scale-98 transition flex items-center justify-center gap-3">
+          <span class="text-xl">&#9654;</span>
+          <span>PLAY</span>
+        </button>
+
+        <button id="btn-open-settings" type="button" class="w-full py-3.5 px-6 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-bold text-sm sm:text-base shadow-lg border border-slate-600/80 active:scale-98 transition flex items-center justify-center gap-2.5">
+          <span class="text-lg">&#9881;</span>
+          <span>SETTING</span>
+        </button>
+
+        <!-- Quick Footer Actions on First Menu -->
+        <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-800/80">
+          <button id="btn-restart-match" type="button" class="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-semibold text-xs border border-slate-700/80 transition">
+            &#8635; Quick Re-Rack Current Table
+          </button>
+          <button id="btn-open-tests" type="button" class="py-2 px-3 rounded-xl bg-violet-600/25 hover:bg-violet-600/40 text-violet-200 border border-violet-500/40 text-xs font-semibold transition">
+            &#9989; Verify Physics Suite (15 Tests)
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- MENU STEP 2: SELECT PLAY MODE (Online, 1v1 Local, vs Bot, Practice)   -->
+      <!-- ===================================================================== -->
+      <div id="menu-step-2" class="hidden flex-col gap-3.5">
+        <div class="flex items-center justify-between">
+          <button id="btn-menu-back-1" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center gap-1.5 active:scale-95 transition">
+            <span>&#8592;</span>
+            <span>Back</span>
+          </button>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">Step 2 of 3 &bull; Select Mode</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- 1. Online Multiplayer -->
+          <button id="btn-mode-online" type="button" class="p-4 rounded-2xl bg-gradient-to-br from-teal-900/50 to-slate-900/90 hover:from-teal-800/60 hover:to-slate-800 border border-teal-500/40 text-left flex flex-col justify-between gap-3 shadow-lg active:scale-98 transition group">
+            <div class="flex items-center justify-between w-full">
+              <span class="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-xl">&#127760;</span>
+              <span class="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-mono font-bold">P2P LIVE</span>
+            </div>
+            <div>
+              <div class="text-sm sm:text-base font-extrabold text-white group-hover:text-teal-300 transition">Online</div>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Host a room link or join a friend's code across any network.</p>
+            </div>
+          </button>
+
+          <!-- 2. 1v1 Local -->
+          <button id="btn-mode-pvp" type="button" class="p-4 rounded-2xl bg-gradient-to-br from-amber-900/40 to-slate-900/90 hover:from-amber-800/50 hover:to-slate-800 border border-amber-500/40 text-left flex flex-col justify-between gap-3 shadow-lg active:scale-98 transition group">
+            <div class="flex items-center justify-between w-full">
+              <span class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl">&#128101;</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold">PASS &amp; PLAY</span>
+            </div>
+            <div>
+              <div class="text-sm sm:text-base font-extrabold text-white group-hover:text-amber-300 transition">1v1 Local</div>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Two players head-to-head on the same device with full tournament rules.</p>
+            </div>
+          </button>
+
+          <!-- 3. vs Bot -->
+          <button id="btn-mode-bot" type="button" class="p-4 rounded-2xl bg-gradient-to-br from-emerald-900/50 to-slate-900/90 hover:from-emerald-800/60 hover:to-slate-800 border border-emerald-500/50 text-left flex flex-col justify-between gap-3 shadow-lg active:scale-98 transition group">
+            <div class="flex items-center justify-between w-full">
+              <span class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-xl">&#129302;</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold">AI MATCH</span>
+            </div>
+            <div>
+              <div class="text-sm sm:text-base font-extrabold text-white group-hover:text-emerald-300 transition">vs Bot</div>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Challenge the club AI Bot across Easy, Medium, or Pro Master difficulty.</p>
+            </div>
+          </button>
+
+          <!-- 4. Practice Solo -->
+          <button id="btn-mode-practice" type="button" class="p-4 rounded-2xl bg-gradient-to-br from-sky-900/45 to-slate-900/90 hover:from-sky-800/55 hover:to-slate-800 border border-sky-500/40 text-left flex flex-col justify-between gap-3 shadow-lg active:scale-98 transition group">
+            <div class="flex items-center justify-between w-full">
+              <span class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-xl">&#127919;</span>
+              <span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-mono font-bold">SOLO TABLE</span>
+            </div>
+            <div>
+              <div class="text-sm sm:text-base font-extrabold text-white group-hover:text-sky-300 transition">Practice Solo</div>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Uninterrupted solo turns to master bank angles, English spin, and run-outs.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- MENU STEP 3: CUSTOMIZE MATCH (Game Mode, Table, Ball Set, Env, Bot)   -->
+      <!-- ===================================================================== -->
+      <div id="menu-step-3" class="hidden flex-col gap-3.5">
+        <div class="flex items-center justify-between">
+          <button id="btn-menu-back-2" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center gap-1.5 active:scale-95 transition">
+            <span>&#8592;</span>
+            <span>Back</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <span id="step3-mode-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-extrabold uppercase">VS BOT</span>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Step 3 of 3 &bull; Match Setup</span>
+          </div>
+        </div>
+
+        <!-- 1. Game Mode Selection: 8-Ball vs 9-Ball Standard Rules -->
+        <div id="step3-gamemode-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-amber-300 mb-2">
+            &#127921; Game Mode &amp; Rules
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-rule-8ball" type="button" class="py-2.5 px-3 rounded-xl text-xs font-extrabold border border-emerald-500 bg-emerald-600/30 text-emerald-200 flex flex-col items-center gap-0.5 transition">
+              <span>8-Ball Standard</span>
+              <span class="text-[9px] font-normal text-emerald-300/90">15 Balls &bull; Solids &amp; Stripes</span>
+            </button>
+            <button id="btn-rule-9ball" type="button" class="py-2.5 px-3 rounded-xl text-xs font-extrabold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-0.5 transition">
+              <span>9-Ball Standard</span>
+              <span class="text-[9px] font-normal text-slate-400">Diamond Rack &bull; Lowest First</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Bot Difficulty Section (Shown only when 'vs Bot' is selected) -->
+        <div id="step3-botdiff-section" class="p-3 rounded-2xl bg-slate-900/85 border border-emerald-500/35">
+          <div class="flex items-center justify-between text-[11px] mb-1.5">
+            <span class="font-bold uppercase tracking-wider text-emerald-300">&#129302; Bot AI Difficulty</span>
             <span id="bot-diff-label" class="font-bold text-amber-300">Medium (Club Player)</span>
           </div>
           <div class="grid grid-cols-3 gap-2">
@@ -351,94 +483,115 @@
               <span class="text-[9px] font-normal text-slate-400">Pro Master</span>
             </button>
           </div>
-          <p id="bot-diff-desc" class="text-[11px] text-slate-400 mt-2 italic leading-relaxed">
+          <p id="bot-diff-desc" class="text-[10px] text-slate-400 mt-1.5 italic leading-snug">
             Medium: Balanced club play with realistic aim, accurate potting, and strategic cue ball placement.
           </p>
         </div>
 
-        <button id="btn-start-bot" type="button" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-lg border border-emerald-400/40 active:scale-95 transition flex items-center justify-center gap-2">
-          <span>&#9654; Start Match vs Bot</span>
-        </button>
-      </div>
-
-      <!-- Mode 2 & Mode 3 Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <!-- Solo Free Practice Card -->
-        <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-sky-500/30 flex flex-col justify-between gap-2.5">
-          <div>
-            <div class="flex items-center gap-1.5 mb-1">
-              <span class="text-sm text-sky-400 font-bold">&#127919;</span>
-              <span class="text-xs font-bold text-white">Solo Practice Table</span>
+        <!-- 3. Player Names & Aiming Guide Section -->
+        <div id="step3-names-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80 space-y-2.5">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="input-p1-name" class="block text-[10px] font-semibold text-slate-400 mb-1">Player 1 Name</label>
+              <input id="input-p1-name" type="text" value="Player 1" maxlength="16" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
             </div>
-            <p class="text-[11px] text-slate-400 leading-snug">
-              Open free play table. Unlimited practice shots, test draw/follow spins &amp; bank angles.
-            </p>
-          </div>
-          <button id="btn-start-practice" type="button" class="w-full py-2 px-3 rounded-xl bg-sky-600/80 hover:bg-sky-500 text-white font-bold text-xs shadow transition active:scale-95">
-            Enter Free Practice
-          </button>
-        </div>
-
-        <!-- 2-Player Local Pass & Play Card -->
-        <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-700/80 flex flex-col justify-between gap-2.5">
-          <div>
-            <div class="flex items-center gap-1.5 mb-1">
-              <span class="text-sm text-amber-400 font-bold">&#128101;</span>
-              <span class="text-xs font-bold text-white">2-Player Pass &amp; Play</span>
+            <div id="step3-p2-name-wrap">
+              <label for="input-p2-name" class="block text-[10px] font-semibold text-slate-400 mb-1">Player 2 Name</label>
+              <input id="input-p2-name" type="text" value="Player 2" maxlength="16" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
             </div>
-            <p class="text-[11px] text-slate-400 leading-snug">
-              Classic local 2-player match on the same device with standard WPA rules.
-            </p>
           </div>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button id="btn-start-match" type="button" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-600 active:scale-95 transition">
-              Guided Match
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] font-semibold text-slate-300">Aiming Trajectory Guide:</span>
+            <div class="flex items-center gap-1.5">
+              <button id="btn-step3-guided" type="button" class="px-3 py-1 rounded-lg text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 transition">
+                Guided ON
+              </button>
+              <button id="btn-step3-unguided" type="button" class="px-3 py-1 rounded-lg text-xs font-bold border border-amber-500 bg-amber-600/30 text-amber-200 transition">
+                Pro Unguided
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Ball Selection: Color Set & Style -->
+        <div id="step3-ballset-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-300 mb-2">
+            &#127912; Ball Set &amp; Color Style
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button id="btn-ballset-classic" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center gap-1 transition">
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+              </div>
+              <span>Classic Pro</span>
             </button>
-            <button id="btn-start-unguided" type="button" class="py-2 px-2 rounded-xl bg-amber-600/80 hover:bg-amber-500 text-white font-bold text-xs active:scale-95 transition">
-              Pro Unguided
+            <button id="btn-ballset-tv" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-700"></span>
+              </div>
+              <span>Tournament TV</span>
+            </button>
+            <button id="btn-ballset-neon" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-lime-400"></span>
+              </div>
+              <span>Neon Cyber</span>
+            </button>
+            <button id="btn-ballset-gold" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
+              <div class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-700"></span>
+              </div>
+              <span>Royal Gold</span>
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Online Multiplayer Full-Width Button -->
-      <button id="btn-open-multiplayer" type="button" class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-teal-500/90 via-cyan-600/90 to-blue-600/90 hover:from-teal-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg border border-teal-400/40 flex items-center justify-between active:scale-95 transition">
-        <span class="flex items-center gap-2">
-          <span>&#127760;</span>
-          <span>Online Multiplayer (Share Link with Friend)</span>
-        </span>
-        <span class="px-2 py-0.5 rounded-md bg-slate-950/50 text-[10px] font-mono text-cyan-200">P2P LIVE</span>
-      </button>
-
-      <!-- Player Names Settings Row -->
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        <div>
-          <label for="input-p1-name" class="block text-[10px] font-semibold text-slate-400 mb-1">Your Name</label>
-          <input id="input-p1-name" type="text" value="Player 1" maxlength="16" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
+        <!-- 5. Table Selection (Felt Cloth Color) -->
+        <div id="step3-table-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-teal-300 mb-2">
+            &#127921; Table Cloth Selection
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btn-step3-felt-blue" type="button" class="py-1.5 rounded-lg bg-blue-900/80 text-xs font-semibold text-blue-100 border border-blue-400">Tournament Blue</button>
+            <button id="btn-step3-felt-green" type="button" class="py-1.5 rounded-lg bg-green-900/60 text-xs font-semibold text-green-100 border border-slate-700">Classic Green</button>
+            <button id="btn-step3-felt-teal" type="button" class="py-1.5 rounded-lg bg-teal-900/60 text-xs font-semibold text-teal-100 border border-slate-700">Club Blue-Green</button>
+            <button id="btn-step3-felt-purple" type="button" class="py-1.5 rounded-lg bg-purple-950/80 text-xs font-semibold text-purple-100 border border-slate-700">Dark Purple</button>
+            <button id="btn-step3-felt-red" type="button" class="py-1.5 rounded-lg bg-red-950/80 text-xs font-semibold text-red-100 border border-slate-700">Dark Red</button>
+            <button id="btn-step3-felt-grey" type="button" class="py-1.5 rounded-lg bg-slate-700/70 text-xs font-semibold text-slate-100 border border-slate-700">Dark Grey</button>
+          </div>
         </div>
-        <div>
-          <label for="input-p2-name" class="block text-[10px] font-semibold text-slate-400 mb-1">Player 2 Name (PvP)</label>
-          <input id="input-p2-name" type="text" value="Player 2" maxlength="16" class="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-400" />
-        </div>
-      </div>
 
-      <!-- Footer Quick Tools -->
-      <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800">
-        <button id="btn-restart-match" type="button" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold text-xs border border-slate-700 transition">
-          &#8635; Re-Rack Table
-        </button>
-        <button id="btn-open-settings" type="button" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition">
-          &#9881; Settings
-        </button>
-        <button id="btn-open-tests" type="button" class="py-2 px-2 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 text-violet-200 border border-violet-500/40 text-xs font-semibold transition">
-          Tests (15)
+        <!-- 6. Environment Selection -->
+        <div id="step3-env-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-purple-300 mb-2">
+            &#127963; Lounge Environment
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btn-step3-env-lounge" type="button" class="py-1.5 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500">Billiards Lounge</button>
+            <button id="btn-step3-env-club" type="button" class="py-1.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">VIP Club</button>
+            <button id="btn-step3-env-dark" type="button" class="py-1.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Midnight Dark</button>
+          </div>
+        </div>
+
+        <!-- Launch Match / Open Online Lobby Action Button -->
+        <button id="btn-launch-configured-match" type="button" class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-extrabold text-sm sm:text-base shadow-xl border border-emerald-400/50 active:scale-98 transition flex items-center justify-center gap-2">
+          <span>&#9654;</span>
+          <span id="step3-launch-text">Start Match</span>
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- Settings Modal: Includes Cue Slider Sensitivity (50% default), Mouse/Touch Aim Sensitivity (5% default), and Low POV Angle (5°-45°) -->
+  <!-- Settings Modal: Includes Cue Slider Sensitivity (50% default), Mouse/Touch Aim Sensitivity (5% default), Low POV Angle (5°-45°), Ball Set, Felt, Environment -->
   <div id="settings-modal" class="hidden fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-slate-700/80 max-h-[92dvh] overflow-y-auto custom-scrollbar">
       <div class="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-800">
@@ -481,6 +634,17 @@
         </div>
       </div>
 
+      <!-- Ball Set & Style Selector in Settings -->
+      <div class="mb-3.5">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Ball Set &amp; Color Style</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-set-ballset-classic" type="button" class="py-1.5 px-2 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500">Classic Pro</button>
+          <button id="btn-set-ballset-tv" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Tournament TV</button>
+          <button id="btn-set-ballset-neon" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Neon Cyber</button>
+          <button id="btn-set-ballset-gold" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Royal Gold</button>
+        </div>
+      </div>
+
       <!-- In-Game Bot Difficulty Selector -->
       <div class="mb-3.5 p-3 rounded-2xl bg-slate-900/80 border border-emerald-500/30">
         <label class="block text-xs font-bold text-emerald-300 mb-1.5 flex items-center gap-1.5">
@@ -505,7 +669,7 @@
         <label class="block text-xs font-semibold text-slate-300">Gameplay &amp; Camera Toggles</label>
         <div class="grid grid-cols-2 gap-2">
           <button id="btn-toggle-guide-modal" type="button" class="py-2 px-2.5 rounded-xl bg-amber-600/30 text-xs font-semibold text-amber-200 border border-amber-500/50 transition">
-            Guide: ON (Guided)
+            Guide: OFF (Unguided)
           </button>
           <button id="btn-camera-mode" type="button" class="py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition">
             Cam: Low POV
@@ -523,9 +687,9 @@
       <div class="mb-3.5 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300 space-y-1">
         <div class="font-bold text-sky-300">PC &amp; Mobile Controls</div>
         <div>&bull; <strong>Aim &amp; Pitch:</strong> Drag on table (Mobile) or move mouse (PC) horizontally to aim, vertically to tilt Low POV (<strong>5&deg;&ndash;45&deg;</strong>); pinch with 2 fingers or scroll wheel to zoom</div>
+        <div>&bull; <strong>Phone Side-Tap Fine Aim:</strong> Tap the <strong>left or right side</strong> of the screen on mobile to micro-adjust your aim left or right</div>
         <div>&bull; <strong>Spin:</strong> Drag the bottom-left <strong>CUE SPIN</strong> pad or Hold <strong>Left-Click + Move Mouse</strong> (PC)</div>
         <div>&bull; <strong>Shoot:</strong> Pull the right <strong>Cue Slider</strong> down &amp; release, or Hold <strong>Ctrl + Pull Mouse Back &amp; Push Forward</strong> (PC)</div>
-        <div>&bull; <strong>Post-Shot Free View:</strong> Enters Free View after a <strong>1s delay</strong> following each shot (locks facing direction &amp; altitude; drag or move mouse to slide camera)</div>
       </div>
 
       <!-- Graphics Quality -->
@@ -676,7 +840,7 @@
     <div class="glass-panel rounded-3xl max-w-2xl w-full p-5 shadow-2xl border border-slate-700 max-h-[90dvh] flex flex-col">
       <div class="flex items-center justify-between mb-3">
         <div>
-          <h2 class="text-base sm:text-lg font-bold text-white">Automated Physics &amp; 8-Ball Rules Verification</h2>
+          <h2 class="text-base sm:text-lg font-bold text-white">Automated Physics, 8-Ball &amp; 9-Ball Rules Verification</h2>
           <p id="tests-summary-line" class="text-xs text-emerald-400 font-mono">Running 15 deterministic unit tests...</p>
         </div>
         <div class="flex items-center gap-2">
@@ -1344,6 +1508,14 @@ class PhysicsWorld {
     this.shotTelemetry.pocketEvents = [];
   }
 
+  setupRack(ruleMode = '8ball') {
+    if (ruleMode === '9ball') {
+      this.setupNineBallRack();
+    } else {
+      this.setupStandardRack();
+    }
+  }
+
   setupStandardRack() {
     this.balls = [];
     const R = BALL_RADIUS;
@@ -1381,6 +1553,57 @@ class PhysicsWorld {
     this.resetTelemetry();
   }
 
+  /**
+   * Standard WPA 9-Ball Diamond Rack:
+   * - 1-Ball on the foot spot apex
+   * - 9-Ball in the center of the diamond
+   * - Balls 2..8 in the remaining diamond positions
+   * - Balls 10..15 marked pocketed/inactive off-table
+   */
+  setupNineBallRack() {
+    this.balls = [];
+    const R = BALL_RADIUS;
+
+    // 0: Cue ball at head string
+    this.balls.push(this.createBall(0, -HALF_L * 0.5, 0));
+
+    const diamondOrder = [
+      [1],
+      [2, 3],
+      [4, 9, 5],
+      [6, 7],
+      [8]
+    ];
+
+    const footSpotX = HALF_L * 0.5;
+    const rowSpacingX = R * Math.sqrt(3) * 1.0015;
+    const colSpacingZ = R * 2.0015;
+
+    for (let row = 0; row < diamondOrder.length; row++) {
+      const rowBalls = diamondOrder[row];
+      const x = footSpotX + row * rowSpacingX;
+      const startZ = -((rowBalls.length - 1) * colSpacingZ) / 2;
+
+      for (let col = 0; col < rowBalls.length; col++) {
+        const id = rowBalls[col];
+        const z = startZ + col * colSpacingZ;
+        this.balls.push(this.createBall(id, x, z));
+      }
+    }
+
+    // Create inactive slots for balls 10..15 so 16-ball mesh arrays stay indexed 0..15
+    for (let id = 10; id <= 15; id++) {
+      const b = this.createBall(id, 0, 0);
+      b.pocketed = true;
+      b.pocketAnimProgress = 1;
+      this.balls.push(b);
+    }
+
+    this.balls.sort((a, b) => a.id - b.id);
+    this.accumulator = 0;
+    this.resetTelemetry();
+  }
+
   createBall(id, x, z) {
     return {
       id,
@@ -1404,8 +1627,16 @@ class PhysicsWorld {
     return this.balls[0];
   }
 
+  getLowestActiveBallId() {
+    for (let id = 1; id <= 15; id++) {
+      const b = this.getBall(id);
+      if (b && !b.pocketed) return id;
+    }
+    return 9;
+  }
+
   /**
-   * Spots a ball (such as the cue ball after a scratch, or 8-ball on the break)
+   * Spots a ball (such as the cue ball after a scratch, 8-ball on the break, or 9-ball on a foul)
    * at the nearest non-overlapping point on the playfield bed.
    */
   spotBall(id, defaultX, defaultZ = 0) {
@@ -1709,18 +1940,21 @@ class PhysicsWorld {
 class EightBallRules {
   state;
 
-  constructor(player1Name = 'Player 1', player2Name = 'Player 2') {
-    this.state = this.createInitialState(player1Name, player2Name, 0, [0, 0]);
+  constructor(player1Name = 'Player 1', player2Name = 'Player 2', ruleMode = '8ball') {
+    this.state = this.createInitialState(player1Name, player2Name, 0, [0, 0], ruleMode);
   }
 
   createInitialState(
     player1Name = 'Player 1',
     player2Name = 'Player 2',
     breakerIndex = 0,
-    wins = [0, 0]
+    wins = [0, 0],
+    ruleMode = '8ball'
   ) {
     const breakerName = breakerIndex === 0 ? player1Name : player2Name;
+    const modeLabel = ruleMode === '9ball' ? '9-Ball' : '8-Ball';
     return {
+      ruleMode,
       players: [
         { id: 1, name: player1Name, group: null, fouls: 0, wins: wins[0] },
         { id: 2, name: player2Name, group: null, fouls: 0, wins: wins[1] }
@@ -1734,10 +1968,12 @@ class EightBallRules {
       gameOver: false,
       winnerPlayerIndex: null,
       winReason: null,
-      lastEventBanner: `${breakerName} to Break (Breaker Cue) — Place Cue Ball Behind Line`,
+      lastEventBanner: `${breakerName} to Break (${modeLabel}) — Place Cue Ball Behind Line`,
       pocketedSolids: [],
       pocketedStripes: [],
       eightBallPocketed: false,
+      nineBallPocketed: false,
+      lowestBallId: 1,
       shotNumber: 0
     };
   }
@@ -1750,10 +1986,11 @@ class EightBallRules {
     player1Name,
     player2Name,
     breakerIndex,
-    preserveScores = false
-  ) {
+    preserveScores = false,
+    ruleMode) {
     const p1 = player1Name ?? this.state.players[0].name;
     const p2 = player2Name ?? this.state.players[1].name;
+    const mode = ruleMode ?? (this.state.ruleMode || '8ball');
     const wins = preserveScores
       ? [this.state.players[0].wins || 0, this.state.players[1].wins || 0]
       : [0, 0];
@@ -1763,7 +2000,7 @@ class EightBallRules {
         : preserveScores && this.state.winnerPlayerIndex !== null
         ? this.state.winnerPlayerIndex
         : 0;
-    this.state = this.createInitialState(p1, p2, nextBreaker, wins);
+    this.state = this.createInitialState(p1, p2, nextBreaker, wins, mode);
   }
 
   getCurrentPlayer() {
@@ -1775,6 +2012,9 @@ class EightBallRules {
   }
 
   getRemainingBallsForGroup(group) {
+    if (this.state.ruleMode === '9ball') {
+      return this.getRemainingNineBallList();
+    }
     if (group === 'solids') {
       return [1, 2, 3, 4, 5, 6, 7].filter((id) => !this.state.pocketedSolids.includes(id));
     }
@@ -1784,10 +2024,31 @@ class EightBallRules {
     return [];
   }
 
+  getRemainingNineBallList() {
+    const rem = [];
+    for (let id = 1; id <= 9; id++) {
+      if (id >= 1 && id <= 7 && this.state.pocketedSolids.includes(id)) continue;
+      if (id === 8 && this.state.eightBallPocketed) continue;
+      if (id === 9 && (this.state.nineBallPocketed || this.state.pocketedStripes.includes(9))) continue;
+      rem.push(id);
+    }
+    return rem;
+  }
+
+  computeLowestRemainingBall() {
+    const rem = this.getRemainingNineBallList();
+    return rem.length > 0 ? rem[0] : 9;
+  }
+
   /**
    * Evaluates a completed shot using the physics ShotTelemetry and updates the match state.
+   * Supports both Standard WPA 8-Ball and Standard WPA 9-Ball rules.
    */
   evaluateShot(telemetry) {
+    if (this.state.ruleMode === '9ball') {
+      return this.evaluateNineBallShot(telemetry);
+    }
+
     const shooterIdx = this.state.currentPlayerIndex;
     const opponentIdx = shooterIdx === 0 ? 1 : 0;
     const shooter = this.state.players[shooterIdx];
@@ -1900,6 +2161,7 @@ class EightBallRules {
           winnerPlayerIndex: null,
           winReason: null,
           respotEightBall: true,
+          respotNineBall: false,
           respotCueBall: scratched,
           summaryBanner
         };
@@ -1934,6 +2196,7 @@ class EightBallRules {
         winnerPlayerIndex: this.state.winnerPlayerIndex,
         winReason: this.state.winReason,
         respotEightBall: false,
+        respotNineBall: false,
         respotCueBall: scratched,
         summaryBanner: this.state.winReason
       };
@@ -1959,6 +2222,7 @@ class EightBallRules {
         winnerPlayerIndex: null,
         winReason: null,
         respotEightBall: false,
+        respotNineBall: false,
         respotCueBall: scratched,
         summaryBanner
       };
@@ -1976,7 +2240,7 @@ class EightBallRules {
       }
 
       shooter.group = assignedGroup;
-      opponent.group = assignedGroup === 'solids' ? 'stripes' : 'solids';
+      opponent.group = assignedGroup === 'solids' ? 'stripes' : 'stripes' === assignedGroup ? 'solids' : 'stripes';
       this.state.tableOpen = false;
       turnContinues = true;
     } else if (this.state.tableOpen) {
@@ -2014,6 +2278,174 @@ class EightBallRules {
       winnerPlayerIndex: null,
       winReason: null,
       respotEightBall: false,
+      respotNineBall: false,
+      respotCueBall: false,
+      summaryBanner
+    };
+  }
+
+  /**
+   * Standard WPA 9-Ball Shot Evaluation:
+   * - Cue ball must always contact the lowest-numbered ball on the table first (`requiredBallId`).
+   * - Pocketing the 9-ball on any legal shot (break, combination, carom, or final ball) wins the rack immediately.
+   * - Pocketing the 9-ball on a foul spots the 9-ball back on the foot spot and awards Ball-in-Hand to the opponent.
+   */
+  evaluateNineBallShot(telemetry) {
+    const shooterIdx = this.state.currentPlayerIndex;
+    const opponentIdx = shooterIdx === 0 ? 1 : 0;
+    const shooter = this.state.players[shooterIdx];
+    const opponent = this.state.players[opponentIdx];
+
+    const wasBreak = this.state.isBreakShot;
+    this.state.isBreakShot = false;
+    this.state.shotNumber++;
+
+    const requiredBallId = this.computeLowestRemainingBall();
+    const scratched = telemetry.pocketedBallIds.includes(0);
+    const ninePocketed = telemetry.pocketedBallIds.includes(9);
+    const pocketedObjectBalls = telemetry.pocketedBallIds.filter((id) => id >= 1 && id <= 9);
+
+    // Record newly pocketed balls (1..8; 9 handled below depending on foul)
+    for (const id of pocketedObjectBalls) {
+      if (id >= 1 && id <= 7) {
+        if (!this.state.pocketedSolids.includes(id)) {
+          this.state.pocketedSolids.push(id);
+        }
+      } else if (id === 8) {
+        this.state.eightBallPocketed = true;
+      }
+    }
+
+    let foul = false;
+    let foulReason = null;
+
+    if (scratched) {
+      foul = true;
+      foulReason = 'Scratch (Cue Ball Pocketed)';
+    } else if (telemetry.firstContactBallId === null) {
+      foul = true;
+      foulReason = 'No Ball Contacted';
+    } else if (telemetry.firstContactBallId !== requiredBallId) {
+      foul = true;
+      foulReason = `Illegal First Contact (Must Strike #${requiredBallId} Ball First)`;
+    } else if (wasBreak) {
+      if (pocketedObjectBalls.length === 0 && telemetry.objectBallsHitCushion.size < 2) {
+        foul = true;
+        foulReason = 'Illegal Break (Insufficient Cushion Contacts)';
+      }
+    } else {
+      if (pocketedObjectBalls.length === 0 && telemetry.cushionHitsAfterFirstContact === 0) {
+        foul = true;
+        foulReason = 'No Cushion Contact After Impact';
+      }
+    }
+
+    // Handle 9-Ball Pocketed
+    if (ninePocketed) {
+      if (!foul) {
+        this.state.nineBallPocketed = true;
+        if (!this.state.pocketedStripes.includes(9)) {
+          this.state.pocketedStripes.push(9);
+        }
+        this.state.gameOver = true;
+        this.state.winnerPlayerIndex = shooterIdx;
+        if (wasBreak) {
+          this.state.winReason = `${shooter.name} pocketed the 9-Ball on the Break!`;
+        } else if (requiredBallId !== 9) {
+          this.state.winReason = `${shooter.name} legally pocketed the 9-Ball via combo (#${requiredBallId} -> #9)!`;
+        } else {
+          this.state.winReason = `${shooter.name} legally pocketed the 9-Ball!`;
+        }
+        this.state.players[shooterIdx].wins = (this.state.players[shooterIdx].wins || 0) + 1;
+        this.state.lastEventBanner = this.state.winReason;
+        return {
+          foul: false,
+          foulReason: null,
+          turnContinues: false,
+          assignedGroup: null,
+          gameOver: true,
+          winnerPlayerIndex: shooterIdx,
+          winReason: this.state.winReason,
+          respotEightBall: false,
+          respotNineBall: false,
+          respotCueBall: false,
+          summaryBanner: this.state.winReason
+        };
+      } else {
+        // 9-ball pocketed on a foul: spot the 9-ball back on the foot spot and award Ball-in-Hand!
+        this.state.nineBallPocketed = false;
+        this.state.pocketedStripes = this.state.pocketedStripes.filter((id) => id !== 9);
+        shooter.fouls++;
+        this.state.currentPlayerIndex = opponentIdx;
+        this.state.ballInHand = true;
+        this.state.behindHeadStringOnly = false;
+        this.state.lowestBallId = this.computeLowestRemainingBall();
+        const summaryBanner = `Foul (${foulReason}) — 9-Ball Spotted, ${opponent.name} has Ball-in-Hand (Target #${this.state.lowestBallId})`;
+        this.state.lastEventBanner = summaryBanner;
+        return {
+          foul: true,
+          foulReason,
+          turnContinues: false,
+          assignedGroup: null,
+          gameOver: false,
+          winnerPlayerIndex: null,
+          winReason: null,
+          respotEightBall: false,
+          respotNineBall: true,
+          respotCueBall: scratched,
+          summaryBanner
+        };
+      }
+    }
+
+    this.state.lowestBallId = this.computeLowestRemainingBall();
+
+    if (foul) {
+      shooter.fouls++;
+      this.state.currentPlayerIndex = opponentIdx;
+      this.state.ballInHand = true;
+      this.state.behindHeadStringOnly = false;
+      const summaryBanner = `Foul: ${foulReason}! ${opponent.name} has Ball-in-Hand (Target #${this.state.lowestBallId}).`;
+      this.state.lastEventBanner = summaryBanner;
+      return {
+        foul: true,
+        foulReason,
+        turnContinues: false,
+        assignedGroup: null,
+        gameOver: false,
+        winnerPlayerIndex: null,
+        winReason: null,
+        respotEightBall: false,
+        respotNineBall: false,
+        respotCueBall: scratched,
+        summaryBanner
+      };
+    }
+
+    const turnContinues = pocketedObjectBalls.length > 0;
+    this.state.ballInHand = false;
+    this.state.behindHeadStringOnly = false;
+
+    if (!turnContinues) {
+      this.state.currentPlayerIndex = opponentIdx;
+    }
+
+    const activePlayer = this.getCurrentPlayer();
+    const summaryBanner = turnContinues
+      ? `Nice shot! ${shooter.name} continues (Target #${this.state.lowestBallId}).`
+      : `Turn switches to ${activePlayer.name} (Target #${this.state.lowestBallId}).`;
+
+    this.state.lastEventBanner = summaryBanner;
+    return {
+      foul: false,
+      foulReason: null,
+      turnContinues,
+      assignedGroup: null,
+      gameOver: false,
+      winnerPlayerIndex: null,
+      winReason: null,
+      respotEightBall: false,
+      respotNineBall: false,
       respotCueBall: false,
       summaryBanner
     };
@@ -2159,10 +2591,14 @@ class BotAI {
   }
 
   /**
-   * Checks whether a ball category is legally strikable first for the current player.
+   * Checks whether a ball is legally strikable first for the current player.
+   * Supports both 8-Ball and 9-Ball standard rules.
    */
   static isBallLegalTarget(id, rules) {
     if (id === 0) return false;
+    if (rules.state.ruleMode === '9ball') {
+      return id === rules.state.lowestBallId;
+    }
     const cat = BallPhysics.getBallCategory(id);
     if (rules.state.isBreakShot || rules.state.tableOpen) {
       return cat !== 'eight';
@@ -2220,13 +2656,17 @@ class BotAI {
       };
     }
 
+    // Ensure lowestBallId is fresh in 9-ball mode
+    if (rules.state.ruleMode === '9ball') {
+      rules.state.lowestBallId = world.getLowestActiveBallId();
+    }
+
     // 2. Identify all active legal object balls
     const legalBalls = world.balls.filter(
       (b) => !b.pocketed && b.id !== 0 && BotAI.isBallLegalTarget(b.id, rules)
     );
 
     if (legalBalls.length === 0) {
-      // Fallback: aim at 8-ball or nearest active ball
       const nearest = world.balls.find((b) => !b.pocketed && b.id !== 0);
       const angle = nearest
         ? Math.atan2(nearest.position.z - cueBall.position.z, nearest.position.x - cueBall.position.x)
@@ -2246,21 +2686,17 @@ class BotAI {
 
     for (const ball of legalBalls) {
       for (const pocket of PocketPhysics.POCKETS) {
-        // Vector from pocket to object ball
         const pdx = ball.position.x - pocket.position.x;
         const pdz = ball.position.z - pocket.position.z;
         const distObjToPocket = Math.hypot(pdx, pdz);
         if (distObjToPocket < 1e-4) continue;
 
-        // Pot direction unit vector (from ball towards pocket)
         const potDirX = -pdx / distObjToPocket;
         const potDirZ = -pdz / distObjToPocket;
 
-        // Ghost ball center position
         const ghostX = ball.position.x - potDirX * twoR;
         const ghostZ = ball.position.z - potDirZ * twoR;
 
-        // Ghost ball must lie safely on table bed
         if (
           Math.abs(ghostX) > HALF_L - R * 0.92 ||
           Math.abs(ghostZ) > HALF_W - R * 0.92
@@ -2268,7 +2704,6 @@ class BotAI {
           continue;
         }
 
-        // Vector from cue ball to ghost ball
         const cdx = ghostX - cueBall.position.x;
         const cdz = ghostZ - cueBall.position.z;
         const distCueToGhost = Math.hypot(cdx, cdz);
@@ -2277,14 +2712,11 @@ class BotAI {
         const cueDirX = cdx / distCueToGhost;
         const cueDirZ = cdz / distCueToGhost;
 
-        // Cut angle alignment: dot product between cue direction and pot direction
         const cutDot = cueDirX * potDirX + cueDirZ * potDirZ;
         if (cutDot <= 0.12) {
-          // Reject thin cut shots (> 83 deg) as unmakeable
           continue;
         }
 
-        // Line-of-sight check 1: Cue Ball -> Ghost Ball
         let cuePathBlocked = false;
         for (const other of world.balls) {
           if (other.pocketed || other.id === 0 || other.id === ball.id) continue;
@@ -2303,7 +2735,6 @@ class BotAI {
         }
         if (cuePathBlocked) continue;
 
-        // Line-of-sight check 2: Object Ball -> Pocket
         let potPathBlocked = false;
         for (const other of world.balls) {
           if (other.pocketed || other.id === 0 || other.id === ball.id) continue;
@@ -2322,7 +2753,6 @@ class BotAI {
         }
         if (potPathBlocked) continue;
 
-        // Scoring: Higher cutDot (straighter shot) and shorter distance is best
         const cutScore = Math.pow(Math.max(0, cutDot), 1.5) * 110;
         const distTotal = distCueToGhost + distObjToPocket;
         const distPenalty = distTotal * 16;
@@ -2340,38 +2770,31 @@ class BotAI {
       }
     }
 
-    // Sort candidates descending by score
     candidates.sort((a, b) => b.score - a.score);
 
-    // If clean potting candidates exist, choose based on difficulty
     if (candidates.length > 0) {
       let chosen = candidates[0];
       let angleNoise = 0;
       let powerMultiplier = 1.0;
 
       if (difficulty === 'easy') {
-        // Easy: Pick from top 4 or random candidate, with noticeable human-like aim error
         const maxIdx = Math.min(candidates.length - 1, 3);
         const idx = Math.floor(Math.random() * (maxIdx + 1));
         chosen = candidates[idx];
-        angleNoise = (Math.random() - 0.5) * 0.040; // ~ +/- 2.3 deg
+        angleNoise = (Math.random() - 0.5) * 0.040;
         powerMultiplier = 0.85 + Math.random() * 0.30;
       } else if (difficulty === 'medium') {
-        // Medium: 80% best shot, 20% second best, mild realistic jitter
         const idx = candidates.length > 1 && Math.random() < 0.22 ? 1 : 0;
         chosen = candidates[idx];
-        angleNoise = (Math.random() - 0.5) * 0.015; // ~ +/- 0.85 deg
+        angleNoise = (Math.random() - 0.5) * 0.015;
         powerMultiplier = 0.92 + Math.random() * 0.16;
       } else {
-        // Hard: Always optimal shot with pinpoint accuracy
         chosen = candidates[0];
-        angleNoise = (Math.random() - 0.5) * 0.003; // ~ +/- 0.17 deg
+        angleNoise = (Math.random() - 0.5) * 0.003;
         powerMultiplier = 0.98 + Math.random() * 0.04;
       }
 
-      // Compute required speed for distance: v = sqrt(2 * mu_roll * g * dist) + margin
       const requiredSpeed = Math.max(1.3, Math.min(5.5, (1.2 + chosen.distTotal * 1.35) * powerMultiplier));
-      // Invert speed curve from ShotController: speed = 0.40 + Math.pow(powerNorm, 1.45) * 8.40
       const powerNorm = Math.max(
         0.12,
         Math.min(1.0, Math.pow(Math.max(0, requiredSpeed - 0.40) / 8.40, 1 / 1.45))
@@ -2387,7 +2810,7 @@ class BotAI {
       };
     }
 
-    // 4. Safety / Snookered Play: If no clean pots exist, aim at nearest legal ball with controlled pace
+    // 4. Safety / Snookered Play: Aim at nearest legal ball with sufficient pace to hit a rail
     let closestBall = legalBalls[0];
     let closestDist = Infinity;
     for (const b of legalBalls) {
@@ -2406,7 +2829,7 @@ class BotAI {
 
     return {
       aimAngleRad: safetyAngle + noise,
-      powerNorm: Math.max(0.18, Math.min(0.42, 0.15 + closestDist * 0.12)),
+      powerNorm: Math.max(0.24, Math.min(0.48, 0.20 + closestDist * 0.14)),
       spin: { x: 0, y: 0 },
       targetBallId: closestBall.id,
       targetPocketId: null,
@@ -2425,7 +2848,6 @@ class BotAI {
     const R = BALL_RADIUS;
     const twoR = 2 * R;
 
-    // Break shot placement: Behind head line
     if (rules.state.behindHeadStringOnly) {
       const candX = -HALF_L * 0.65;
       const candZ = (Math.random() - 0.5) * 0.35;
@@ -2434,7 +2856,10 @@ class BotAI {
       return { x: -HALF_L * 0.55, y: R, z: 0 };
     }
 
-    // Normal Ball-in-Hand: Find easiest legal object ball and place cue ball in direct straight line ~0.36m away
+    if (rules.state.ruleMode === '9ball') {
+      rules.state.lowestBallId = world.getLowestActiveBallId();
+    }
+
     const legalBalls = world.balls.filter(
       (b) => !b.pocketed && b.id !== 0 && BotAI.isBallLegalTarget(b.id, rules)
     );
@@ -2449,7 +2874,6 @@ class BotAI {
         const potDirX = -pdx / pdist;
         const potDirZ = -pdz / pdist;
 
-        // Position cue ball 0.35m straight behind the ghost ball for a trivial straight-in pot
         const candX = ball.position.x - potDirX * (twoR + 0.35);
         const candZ = ball.position.z - potDirZ * (twoR + 0.35);
 
@@ -2459,7 +2883,6 @@ class BotAI {
       }
     }
 
-    // Fallback: Safe central open table placement
     const fallbackSpots = [
       { x: -0.4, z: 0 },
       { x: 0, z: 0 },
@@ -2529,9 +2952,17 @@ class TurnManager {
       this.world.spotBall(8, HALF_L * 0.5, 0);
     }
 
+    if (res.respotNineBall) {
+      this.world.spotBall(9, HALF_L * 0.5, 0);
+    }
+
     // Always return the white cue ball to the table if it was potted (scratched)
     if (res.respotCueBall || this.world.getCueBall().pocketed) {
       this.world.spotBall(0, -HALF_L * 0.5, 0);
+    }
+
+    if (this.rules.state.ruleMode === '9ball') {
+      this.rules.state.lowestBallId = this.world.getLowestActiveBallId();
     }
 
     if (practiceMode && !res.gameOver) {
@@ -2541,6 +2972,8 @@ class TurnManager {
         this.rules.state.lastEventBanner = `Practice Mode (${res.foulReason}) — White Ball Returned (Ball-in-Hand)`;
       } else if (res.assignedGroup) {
         this.rules.state.lastEventBanner = `Practice Mode — Claimed ${res.assignedGroup.toUpperCase()}! Continue Shooting`;
+      } else if (this.rules.state.ruleMode === '9ball') {
+        this.rules.state.lastEventBanner = `Practice Mode (9-Ball) — Next Target: #${this.rules.state.lowestBallId}`;
       } else {
         this.rules.state.lastEventBanner = 'Practice Mode — Continue Shooting';
       }
@@ -2955,8 +3388,129 @@ class CollisionAudio {
 
 
 // === MODULE: src/rendering/BallRenderer.ts ===
-// Procedural High-DPI Canvas Texture Generator for all 16 regulation billiard balls
+// Procedural High-DPI Canvas Texture Generator for all 16 regulation billiard balls with selectable Ball Sets & Styles
 
+
+
+
+const BALL_STYLE_SETS = {
+  classic: {
+    key: 'classic',
+    label: 'Classic Pro',
+    baseCoat: '#f7f5eb',
+    cueBaseRgb: [247, 245, 235],
+    cueDotRgb: [216, 34, 34],
+    medallionBg: '#f8f6f0',
+    medallionRing: 'rgba(0,0,0,0.22)',
+    medallionText: '#0f172a',
+    stripeStyle: 'classic',
+    colors: {
+      0: '#f8f6f0',
+      1: '#eab308',
+      2: '#1d4ed8',
+      3: '#dc2626',
+      4: '#6d28d9',
+      5: '#ea580c',
+      6: '#15803d',
+      7: '#7f1d1d',
+      8: '#111827',
+      9: '#eab308',
+      10: '#1d4ed8',
+      11: '#dc2626',
+      12: '#6d28d9',
+      13: '#ea580c',
+      14: '#15803d',
+      15: '#7f1d1d'
+    }
+  },
+  tournament_tv: {
+    key: 'tournament_tv',
+    label: 'Tournament TV',
+    baseCoat: '#fcfbf7',
+    cueBaseRgb: [252, 251, 247],
+    cueDotRgb: [225, 29, 72],
+    medallionBg: '#ffffff',
+    medallionRing: '#dc2626',
+    medallionText: '#090d16',
+    stripeStyle: 'tv_bordered',
+    colors: {
+      0: '#fcfbf7',
+      1: '#facc15',
+      2: '#0284c7',
+      3: '#ef4444',
+      4: '#ec4899', // TV Pink 4-ball
+      5: '#f97316',
+      6: '#10b981',
+      7: '#a16207', // TV Camel/Tan 7-ball
+      8: '#090d16',
+      9: '#facc15',
+      10: '#0284c7',
+      11: '#ef4444',
+      12: '#ec4899', // TV Pink 12-ball
+      13: '#f97316',
+      14: '#10b981',
+      15: '#a16207'  // TV Camel/Tan 15-ball
+    }
+  },
+  neon_cyber: {
+    key: 'neon_cyber',
+    label: 'Neon Cyber',
+    baseCoat: '#0f172a',
+    cueBaseRgb: [22, 32, 54],
+    cueDotRgb: [34, 211, 238],
+    medallionBg: '#090d16',
+    medallionRing: '#38bdf8',
+    medallionText: '#f8fafc',
+    stripeStyle: 'neon_ring',
+    colors: {
+      0: '#38bdf8',
+      1: '#fde047',
+      2: '#00f0ff',
+      3: '#ff2a85',
+      4: '#c084fc',
+      5: '#ff7b00',
+      6: '#00ff9d',
+      7: '#f43f5e',
+      8: '#64748b',
+      9: '#fde047',
+      10: '#00f0ff',
+      11: '#ff2a85',
+      12: '#c084fc',
+      13: '#ff7b00',
+      14: '#00ff9d',
+      15: '#f43f5e'
+    }
+  },
+  royal_gold: {
+    key: 'royal_gold',
+    label: 'Royal Gold',
+    baseCoat: '#faf6eb',
+    cueBaseRgb: [250, 246, 235],
+    cueDotRgb: [180, 130, 25],
+    medallionBg: '#fffbeb',
+    medallionRing: '#d4af37',
+    medallionText: '#1c1917',
+    stripeStyle: 'gold_trimmed',
+    colors: {
+      0: '#fef3c7',
+      1: '#d97706',
+      2: '#1e3a8a',
+      3: '#991b1b',
+      4: '#581c87',
+      5: '#c2410c',
+      6: '#065f46',
+      7: '#451a03',
+      8: '#18181b',
+      9: '#d97706',
+      10: '#1e3a8a',
+      11: '#991b1b',
+      12: '#581c87',
+      13: '#c2410c',
+      14: '#065f46',
+      15: '#451a03'
+    }
+  }
+};
 
 const BALL_COLORS = {
   0:  { id: 0,  hex: '#f8f6f0', name: 'Cue Ball',        isStripe: false },
@@ -2978,33 +3532,43 @@ const BALL_COLORS = {
 };
 
 class BallTextureBuilder {
+  static currentSetKey = 'classic';
+
+  static setBallSet(setKey) {
+    if (!BALL_STYLE_SETS[setKey]) return;
+    BallTextureBuilder.currentSetKey = setKey;
+    const styleSet = BALL_STYLE_SETS[setKey];
+    for (let id = 0; id <= 15; id++) {
+      if (BALL_COLORS[id] && styleSet.colors[id]) {
+        BALL_COLORS[id].hex = styleSet.colors[id];
+      }
+    }
+  }
+
   /**
    * Generates an equirectangular 512x256 texture canvas for a billiard ball
    * with accurate stripe geometry, dual number medallions, and 3D-projected
    * evenly spaced octahedral measles dots on the cue ball.
    */
-  static createBallCanvas(id) {
+  static createBallCanvas(id, setKey = BallTextureBuilder.currentSetKey) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 256;
     const ctx = canvas.getContext('2d');
+    const styleSet = BALL_STYLE_SETS[setKey] || BALL_STYLE_SETS.classic;
     const spec = BALL_COLORS[id] || BALL_COLORS[0];
+    const ballHex = styleSet.colors[id] || spec.hex;
 
-    // Base warm Aramith phenolic ivory coat
-    ctx.fillStyle = '#f7f5eb';
+    // Base phenolic coat
+    ctx.fillStyle = styleSet.baseCoat;
     ctx.fillRect(0, 0, 512, 256);
 
     if (id === 0) {
-      // Pro tournament "measles" cue ball with 6 crimson dots placed at exact 90-degree
-      // 3D octahedral vertices on the sphere, projected into equirectangular UV space
-      // so every dot is 100% evenly spaced and circular without latitude distortion.
       const imgData = ctx.getImageData(0, 0, 512, 256);
       const data = imgData.data;
 
-      // 6 mutually orthogonal 3D unit vectors of a regular octahedron, rotated slightly
-      // off the UV poles so no dot sits on a pole singularity or UV seam.
-      const rotX = 0.52; // ~30 deg
-      const rotZ = 0.36; // ~20.6 deg
+      const rotX = 0.52;
+      const rotZ = 0.36;
       const cx = Math.cos(rotX), sx = Math.sin(rotX);
       const cz = Math.cos(rotZ), sz = Math.sin(rotZ);
 
@@ -3015,24 +3579,24 @@ class BallTextureBuilder {
       ];
 
       const dotCenters = rawAxes.map(([ax, ay, az]) => {
-        // Rotate around X
         const y1 = ay * cx - az * sx;
         const z1 = ay * sx + az * cx;
         const x1 = ax;
-        // Rotate around Z
         const x2 = x1 * cz - y1 * sz;
         const y2 = x1 * sz + y1 * cz;
         const z2 = z1;
         return [x2, y2, z2];
       });
 
-      const dotRadiusRad = 0.148; // Angular radius of each crimson dot on the sphere
+      const dotRadiusRad = 0.148;
       const edgeFeatherRad = 0.014;
       const cosOuter = Math.cos(dotRadiusRad + edgeFeatherRad);
+      const [baseR, baseG, baseB] = styleSet.cueBaseRgb;
+      const [dotR, dotG, dotB] = styleSet.cueDotRgb;
 
       for (let py = 0; py < 256; py++) {
         const v = (py + 0.5) / 256;
-        const theta = v * Math.PI; // 0 at north pole, PI at south pole
+        const theta = v * Math.PI;
         const sinTheta = Math.sin(theta);
         const ny = Math.cos(theta);
 
@@ -3048,6 +3612,12 @@ class BallTextureBuilder {
             if (d > maxDot) maxDot = d;
           }
 
+          const idx = (py * 512 + px) * 4;
+          data[idx] = baseR;
+          data[idx + 1] = baseG;
+          data[idx + 2] = baseB;
+          data[idx + 3] = 255;
+
           if (maxDot > cosOuter) {
             const angle = Math.acos(Math.min(1, maxDot));
             let alpha = 0;
@@ -3057,11 +3627,9 @@ class BallTextureBuilder {
               alpha = 1.0 - (angle - (dotRadiusRad - edgeFeatherRad)) / (2 * edgeFeatherRad);
             }
             if (alpha > 0) {
-              const idx = (py * 512 + px) * 4;
-              // Blend ivory (#f7f5eb -> 247, 245, 235) with crimson (#dc2626 -> 220, 38, 38)
-              data[idx]     = Math.round(247 * (1 - alpha) + 216 * alpha);
-              data[idx + 1] = Math.round(245 * (1 - alpha) + 34 * alpha);
-              data[idx + 2] = Math.round(235 * (1 - alpha) + 34 * alpha);
+              data[idx]     = Math.round(baseR * (1 - alpha) + dotR * alpha);
+              data[idx + 1] = Math.round(baseG * (1 - alpha) + dotG * alpha);
+              data[idx + 2] = Math.round(baseB * (1 - alpha) + dotB * alpha);
               data[idx + 3] = 255;
             }
           }
@@ -3072,13 +3640,42 @@ class BallTextureBuilder {
     }
 
     if (!spec.isStripe) {
-      // Solid color coat
-      ctx.fillStyle = spec.hex;
-      ctx.fillRect(0, 0, 512, 256);
+      if (styleSet.stripeStyle === 'neon_ring') {
+        // Dark carbon body with glowing wide color band and bright neon border lines
+        ctx.fillStyle = '#0b1120';
+        ctx.fillRect(0, 0, 512, 256);
+        ctx.fillStyle = ballHex;
+        ctx.fillRect(0, 28, 512, 200);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 28, 512, 4);
+        ctx.fillRect(0, 224, 512, 4);
+      } else {
+        ctx.fillStyle = ballHex;
+        ctx.fillRect(0, 0, 512, 256);
+        if (styleSet.stripeStyle === 'gold_trimmed') {
+          ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
+          ctx.fillRect(0, 42, 512, 4);
+          ctx.fillRect(0, 210, 512, 4);
+        }
+      }
     } else {
       // Equatorial color stripe band (occupies middle 54% of height)
-      ctx.fillStyle = spec.hex;
+      ctx.fillStyle = ballHex;
       ctx.fillRect(0, 58, 512, 140);
+
+      if (styleSet.stripeStyle === 'tv_bordered') {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 54, 512, 4);
+        ctx.fillRect(0, 198, 512, 4);
+      } else if (styleSet.stripeStyle === 'neon_ring') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 55, 512, 5);
+        ctx.fillRect(0, 196, 512, 5);
+      } else if (styleSet.stripeStyle === 'gold_trimmed') {
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(0, 54, 512, 5);
+        ctx.fillRect(0, 197, 512, 5);
+      }
     }
 
     // Draw dual opposing number medallions at (128, 128) and (384, 128)
@@ -3087,13 +3684,13 @@ class BallTextureBuilder {
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-      ctx.fillStyle = '#f8f6f0';
+      ctx.fillStyle = styleSet.medallionBg;
       ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = styleSet.stripeStyle === 'classic' ? 2 : 3.5;
+      ctx.strokeStyle = styleSet.stripeStyle === 'neon_ring' ? ballHex : styleSet.medallionRing;
       ctx.stroke();
 
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = styleSet.stripeStyle === 'neon_ring' ? ballHex : styleSet.medallionText;
       ctx.font = 'bold 42px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -4799,21 +5396,28 @@ class SceneManager {
   }
 
   /**
-   * Image 1 Breaker Cue Texture (`image_1ab733.png`):
-   * - Matte dark navy-slate carbon composite shaft from tip (`y = 0`) down to joint (`y = 330`)
-   * - Subtle dark embossed emblem just above the joint (`y = 310..326`)
-   * - High-gloss anodized metallic collar ring (`y = 330..366`) with electric cyan-blue edges (`#00b4ff`)
-   *   and a deep ruby-crimson metallic center reflection (`#b91c1c`)
-   * - Crisp thin white/silver trim ring (`y = 366..374`)
-   * - Glossy midnight-black/navy butt sleeve (`y = 374..1024`) with a deep crimson-red center reflection stripe.
+   * Dynamically switches all 16 3D billiard balls to the selected color & style set.
    */
+  setBallSet(setKey) {
+    BallTextureBuilder.setBallSet(setKey);
+    for (let id = 0; id <= 15; id++) {
+      const mesh = this.ballMeshes.get(id);
+      if (!mesh || !mesh.material) continue;
+      const texCanvas = BallTextureBuilder.createBallCanvas(id, setKey);
+      const newTex = new THREE.CanvasTexture(texCanvas);
+      mesh.material.map = newTex;
+      mesh.material.roughness = setKey === 'neon_cyber' ? 0.18 : setKey === 'royal_gold' ? 0.09 : 0.12;
+      mesh.material.metalness = setKey === 'royal_gold' ? 0.15 : setKey === 'neon_cyber' ? 0.12 : 0.06;
+      mesh.material.needsUpdate = true;
+    }
+  }
+
   static createBreakerCueTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 1024;
     const ctx = canvas.getContext('2d');
 
-    // 1. Matte dark navy-charcoal carbon shaft (y = 0..332, which is the front 46cm of the cue)
     const shaftGrad = ctx.createLinearGradient(0, 0, 512, 0);
     shaftGrad.addColorStop(0.0, '#161e2e');
     shaftGrad.addColorStop(0.25, '#222d42');
@@ -4823,13 +5427,11 @@ class SceneManager {
     ctx.fillStyle = shaftGrad;
     ctx.fillRect(0, 0, 512, 332);
 
-    // Subtle micro-matte carbon texture lines along shaft
     ctx.fillStyle = 'rgba(255, 255, 255, 0.018)';
     for (let y = 0; y < 332; y += 3) {
       ctx.fillRect(0, y, 512, 1);
     }
 
-    // Subtle dark embossed emblem just above joint collar (y = 304..324)
     ctx.save();
     ctx.strokeStyle = '#0d131f';
     ctx.fillStyle = '#121926';
@@ -4842,7 +5444,6 @@ class SceneManager {
     }
     ctx.restore();
 
-    // 2. Metallic Anodized Cyan-Blue & Ruby-Red Chrome Collar Ring (y = 332..368)
     const ringGrad = ctx.createLinearGradient(0, 0, 512, 0);
     ringGrad.addColorStop(0.0, '#00b4ff');
     ringGrad.addColorStop(0.16, '#38bdf8');
@@ -4859,17 +5460,14 @@ class SceneManager {
     ctx.fillStyle = ringGrad;
     ctx.fillRect(0, 332, 512, 36);
 
-    // Dark micro-bevel above collar ring
     ctx.fillStyle = '#090d16';
     ctx.fillRect(0, 329, 512, 3);
 
-    // 3. Crisp Thin White / Silver Trim Ring below collar (y = 368..375)
     ctx.fillStyle = '#f1f5f9';
     ctx.fillRect(0, 368, 512, 7);
     ctx.fillStyle = '#090d16';
     ctx.fillRect(0, 375, 512, 3);
 
-    // 4. High-Gloss Lacquered Midnight-Navy & Ruby-Highlight Butt Handle (y = 378..1024)
     const buttGrad = ctx.createLinearGradient(0, 0, 512, 0);
     buttGrad.addColorStop(0.0, '#0d192b');
     buttGrad.addColorStop(0.18, '#172a45');
@@ -4891,20 +5489,12 @@ class SceneManager {
     return tex;
   }
 
-  /**
-   * Image 2 Normal Playing Cue Texture (`image_1aba5b.png`):
-   * - Pale cream/ivory English Ash wood base (`#e6dec8` / `#dbd2ba`)
-   * - Distinctive dark charcoal-brown porous V-shaped chevron ("arrow" / cathedral) ash grain flames
-   *   pointing forward toward the cue tip along the shaft
-   * - Classic dark ebony/walnut splice points on the lower butt handle.
-   */
   static createPlayingCueTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 1024;
     const ctx = canvas.getContext('2d');
 
-    // 1. Pale Cream / English Ash wood base coat
     const baseGrad = ctx.createLinearGradient(0, 0, 512, 0);
     baseGrad.addColorStop(0.0, '#d5cbb2');
     baseGrad.addColorStop(0.25, '#e8e0cb');
@@ -4914,15 +5504,12 @@ class SceneManager {
     ctx.fillStyle = baseGrad;
     ctx.fillRect(0, 0, 512, 1024);
 
-    // Fine longitudinal ash wood pores
     for (let x = 0; x < 512; x += 2) {
       ctx.fillStyle = x % 4 === 0 ? 'rgba(90, 72, 48, 0.06)' : 'rgba(255, 255, 255, 0.04)';
       ctx.fillRect(x, 0, 1, 1024);
     }
 
-    // Helper to draw a porous, grainy dark-ash chevron ("V" arrow pointing up toward y=0 tip)
     const drawAshChevron = (centerX, apexY, baseY, halfWidth, thickness) => {
-      // Draw multiple overlapping stippled/porous strokes to replicate authentic open-grain English Ash
       for (let layer = -thickness; layer <= thickness; layer += 1.2) {
         const alpha = (1.0 - Math.abs(layer) / (thickness + 1)) * 0.52;
         ctx.strokeStyle = `rgba(58, 45, 32, ${alpha.toFixed(3)})`;
@@ -4944,13 +5531,11 @@ class SceneManager {
         ctx.stroke();
       }
 
-      // Add dark ash pore speckles along the chevron arms
       ctx.fillStyle = 'rgba(42, 32, 22, 0.55)';
       const steps = 140;
       for (let s = 0; s <= steps; s++) {
         const t = s / steps;
         for (const side of [-1, 1]) {
-          // Quadratic bezier point along arm
           const p0x = centerX;
           const p0y = apexY;
           const p1x = centerX + side * halfWidth * 0.32;
@@ -4966,7 +5551,6 @@ class SceneManager {
       }
     };
 
-    // Draw nested V-shaped ash grain chevrons around both sides of the shaft circumference (cx = 128 and cx = 384, plus 256)
     const chevronSpecs = [
       [55, 195, 42, 4.5],
       [135, 295, 48, 5.5],
@@ -4979,14 +5563,12 @@ class SceneManager {
         drawAshChevron(cx, apexY, baseY, hw, thick);
       }
     }
-    // Secondary side grain lines between chevrons
     for (const cx of [0, 256, 512]) {
       for (const [apexY, baseY, hw, thick] of chevronSpecs) {
         drawAshChevron(cx, apexY + 35, baseY + 40, hw * 0.75, thick * 0.8);
       }
     }
 
-    // 4-point dark ebony/walnut splice on the lower butt handle (y = 580..1024)
     for (let p = 0; p < 4; p++) {
       const cx = (p + 0.5) * 128;
       ctx.beginPath();
@@ -5009,16 +5591,11 @@ class SceneManager {
   initCueAndAimHelpers() {
     this.cueStickGroup = new THREE.Group();
     const cueLen = 1.42;
-    const thicknessScale = 0.90 * 1.50; // 50% thicker than previous cue while keeping exact same texture and form
+    const thicknessScale = 0.90 * 1.50;
 
-    // Note on CylinderGeometry orientation:
-    // Using rotateZ(-Math.PI / 2) places radiusTop (y = +cueLen/2) at +X (the cue ball tip end)
-    // and radiusBottom (y = -cueLen/2) at -X (the butt handle end), AND maps UV v=1 at the tip
-    // (canvas y=0) to v=0 at the butt (canvas y=1024).
-    const rTip = 0.0035 * thicknessScale;   // 4.725mm at tip (50% thicker)
-    const rButt = 0.0080 * thicknessScale;  // 10.80mm at butt handle (50% thicker)
+    const rTip = 0.0035 * thicknessScale;
+    const rButt = 0.0080 * thicknessScale;
 
-    // 1. Unified Full-Length Tapered Cue Stick Body (1.42m)
     const bodyGeo = new THREE.CylinderGeometry(rTip, rButt, cueLen, 28, 1);
     bodyGeo.rotateZ(-Math.PI / 2);
     bodyGeo.translate(-cueLen / 2 - BALL_RADIUS - 0.018, 0, 0);
@@ -5041,7 +5618,6 @@ class SceneManager {
     this.cueBodyMesh.castShadow = true;
     this.cueStickGroup.add(this.cueBodyMesh);
 
-    // 2. Slim Ferrule Collar between tip and shaft
     const ferruleGeo = new THREE.CylinderGeometry(rTip * 0.98, rTip * 1.01, 0.009, 20);
     ferruleGeo.rotateZ(-Math.PI / 2);
     ferruleGeo.translate(-BALL_RADIUS - 0.015, 0, 0);
@@ -5059,7 +5635,6 @@ class SceneManager {
     this.cueFerruleMesh = new THREE.Mesh(ferruleGeo, this.breakerFerruleMat);
     this.cueStickGroup.add(this.cueFerruleMesh);
 
-    // 3. Cue Tip (Dark phenolic break tip for Breaker Cue; dark leather/blue-chalk tip for Playing Cue)
     const tipGeo = new THREE.CylinderGeometry(rTip * 0.94, rTip * 0.98, 0.008, 20);
     tipGeo.rotateZ(-Math.PI / 2);
     tipGeo.translate(-BALL_RADIUS - 0.008, 0, 0);
@@ -5105,11 +5680,6 @@ class SceneManager {
     this.scene.add(this.ghostBallMesh);
   }
 
-  /**
-   * Switches between:
-   * - Image 1 Breaker Cue (`isBreakShot === true`: matte navy carbon shaft + cyan/ruby metallic ring + glossy black/red butt)
-   * - Image 2 Normal Playing Cue (`isBreakShot === false`: English Ash wood with dark V-shaped chevron grain flames)
-   */
   setBreakerCueActive(isBreakShot) {
     if (this.isBreakerCueEquipped === isBreakShot) return;
     this.isBreakerCueEquipped = isBreakShot;
@@ -6043,7 +6613,6 @@ function runAllTests() {
     assert(lossRes.gameOver && lossRes.winnerPlayerIndex === 1, 'Early 8-ball pocket must lose the game');
     assert(rulesLoss.state.players[1].wins === 1, 'Winner (Bob) score count must increment to 1');
 
-    // Reset match preserving scores -> Bob (winner, index 1) must break next round!
     rulesLoss.resetMatch('Alice', 'Bob', undefined, true);
     assert(rulesLoss.state.currentPlayerIndex === 1 && rulesLoss.state.isBreakShot, 'Winner (Bob) must break the next round');
     assert(rulesLoss.state.players[1].wins === 1 && rulesLoss.state.players[0].wins === 0, 'Score count 0-1 must persist into next round');
@@ -6099,29 +6668,31 @@ function runAllTests() {
     return `Exact bit-identical final positions across 30/60/120 FPS (drift = ${diff30_120.toExponential(2)} m)`;
   });
 
-  // 14. TurnManager Potted White Ball Return & First-Ball-Potted Group Selection
-  runTest('14. Potted White Ball Auto-Return & First-Ball-Potted Group Selection', () => {
+  // 14. Standard 9-Ball Diamond Rack, Lowest-Ball Rule, Combo Win & Foul Respot
+  runTest('14. Standard 9-Ball Diamond Rack, Lowest-Ball Rule & Combo Victory', () => {
     const world = new PhysicsWorld();
-    const rules = new EightBallRules('Player 1', 'Player 2');
-    const turnMgr = new TurnManager(rules, world);
+    world.setupNineBallRack();
+    const activeNineBalls = world.balls.filter((b) => !b.pocketed && b.id !== 0);
+    assert(activeNineBalls.length === 9, `Expected 9 active object balls in 9-ball rack, got ${activeNineBalls.length}`);
+    assert(Math.abs(world.getBall(1).position.x - HALF_L * 0.5) < 1e-4, '1-Ball must sit on the foot spot apex');
 
-    world.shotTelemetry.firstContactBallId = 9;
-    world.shotTelemetry.pocketedBallIds = [9];
-    const firstPotRes = turnMgr.handleShotComplete(false);
-    assert(firstPotRes.assignedGroup === 'stripes', `Expected first potted ball (#9) to assign STRIPES, got ${firstPotRes.assignedGroup}`);
-    assert(rules.state.players[0].group === 'stripes' && rules.state.players[1].group === 'solids', 'Expected P1=stripes, P2=solids');
+    const rules9 = new EightBallRules('Alice', 'Bob', '9ball');
+    rules9.state.isBreakShot = false;
 
-    const cue = world.getCueBall();
-    cue.pocketed = true;
-    cue.pocketId = 0;
-    cue.position.y = -0.05;
-    world.shotTelemetry = world.createEmptyTelemetry();
-    world.shotTelemetry.firstContactBallId = 10;
-    world.shotTelemetry.pocketedBallIds = [0];
-    const scratchRes = turnMgr.handleShotComplete(false);
-    assert(scratchRes.foul && scratchRes.respotCueBall, 'Expected scratch foul');
-    assert(!cue.pocketed && Math.abs(cue.position.y - BALL_RADIUS) < 1e-6, 'Potted white ball must return back on the table bed');
-    return `First pot (#9) assigned STRIPES; potted white ball returned to (${cue.position.x.toFixed(2)}, ${cue.position.z.toFixed(2)})`;
+    // Foul by striking #2 when #1 is lowest on table
+    const wrongHit = world.createEmptyTelemetry();
+    wrongHit.firstContactBallId = 2;
+    wrongHit.cushionHitsAfterFirstContact = 1;
+    const foulRes = rules9.evaluateShot(wrongHit);
+    assert(foulRes.foul && rules9.state.ballInHand && rules9.getCurrentPlayer().name === 'Bob', 'Striking #2 before #1 must foul and award Ball-in-Hand');
+
+    // Legal 1-9 combination shot wins immediately!
+    const comboWin = world.createEmptyTelemetry();
+    comboWin.firstContactBallId = 1;
+    comboWin.pocketedBallIds = [9];
+    const winRes = rules9.evaluateShot(comboWin);
+    assert(winRes.gameOver && winRes.winnerPlayerIndex === 1, 'Legal 1->9 combination pot must win 9-ball game immediately');
+    return `9-Ball diamond rack (1..9), lowest-ball foul guard & legal #1->#9 combo victory verified`;
   });
 
   // 15. Bot AI Multi-Difficulty Shot Planning & Ball-in-Hand Placement
@@ -6154,17 +6725,20 @@ function runAllTests() {
 
 
     // ============================================================================
-    // APPLICATION CONTROLLER, BOT AI STATE MACHINE, MULTIPLAYER & PC/MOBILE LOOP
+    // APPLICATION CONTROLLER, 3-STEP MENU, 8/9-BALL, BALL SETS & PC/MOBILE LOOP
     // ============================================================================
     (function initPoolApp() {
       const world = new PhysicsWorld();
-      const rules = new EightBallRules('Player 1', 'Bot (Medium)');
+      const rules = new EightBallRules('Player 1', 'Bot (Medium)', '8ball');
       const shot = new ShotController();
       const turnManager = new TurnManager(rules, world);
       const audio = new AudioManager();
 
-      // Game Modes: 'bot' (Solo match vs AI Bot), 'practice' (Solo free table), 'pvp' (2-Player local Pass & Play)
+      // Game Modes: 'bot' (Solo match vs AI Bot), 'practice' (Solo free table), 'pvp' (2-Player local), 'online' (Online P2P)
       let gameMode = 'bot';
+      let selectedMenuPlayMode = 'bot'; // 'online' | 'pvp' | 'bot' | 'practice'
+      let ruleMode = '8ball'; // '8ball' | '9ball'
+      let ballSetKey = 'classic'; // 'classic' | 'tournament_tv' | 'neon_cyber' | 'royal_gold'
       let botDifficulty = 'medium'; // 'easy' | 'medium' | 'hard'
       let unguidedMode = true;
       let isPullingCueSlider = false;
@@ -6219,6 +6793,102 @@ function runAllTests() {
       const statusPopupToast = document.getElementById('status-popup-toast');
       const hudStatusBanner = document.getElementById('hud-status-banner');
 
+      // 3-Step Menu Containers
+      const menuStep1 = document.getElementById('menu-step-1');
+      const menuStep2 = document.getElementById('menu-step-2');
+      const menuStep3 = document.getElementById('menu-step-3');
+
+      function showMenuStep(stepNum) {
+        menuStep1.classList.add('hidden');
+        menuStep1.classList.remove('flex');
+        menuStep2.classList.add('hidden');
+        menuStep2.classList.remove('flex');
+        menuStep3.classList.add('hidden');
+        menuStep3.classList.remove('flex');
+
+        if (stepNum === 1) {
+          menuStep1.classList.remove('hidden');
+          menuStep1.classList.add('flex');
+        } else if (stepNum === 2) {
+          menuStep2.classList.remove('hidden');
+          menuStep2.classList.add('flex');
+        } else {
+          menuStep3.classList.remove('hidden');
+          menuStep3.classList.add('flex');
+        }
+      }
+
+      function configureMenuStep3ForMode(modeChoice) {
+        selectedMenuPlayMode = modeChoice;
+        const badgeEl = document.getElementById('step3-mode-badge');
+        const botDiffSec = document.getElementById('step3-botdiff-section');
+        const namesSec = document.getElementById('step3-names-section');
+        const p2Wrap = document.getElementById('step3-p2-name-wrap');
+        const launchText = document.getElementById('step3-launch-text');
+
+        if (modeChoice === 'online') {
+          badgeEl.textContent = 'ONLINE P2P';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-mono font-extrabold uppercase';
+          botDiffSec.classList.add('hidden');
+          namesSec.classList.remove('hidden');
+          p2Wrap.classList.add('hidden');
+          launchText.textContent = 'Open Online Room Lobby';
+        } else if (modeChoice === 'pvp') {
+          badgeEl.textContent = '1V1 LOCAL';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-extrabold uppercase';
+          botDiffSec.classList.add('hidden');
+          namesSec.classList.remove('hidden');
+          p2Wrap.classList.remove('hidden');
+          launchText.textContent = 'Start 1v1 Local Match';
+        } else if (modeChoice === 'bot') {
+          badgeEl.textContent = 'VS BOT AI';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-extrabold uppercase';
+          botDiffSec.classList.remove('hidden');
+          namesSec.classList.remove('hidden');
+          p2Wrap.classList.add('hidden');
+          launchText.textContent = 'Start Match vs Bot';
+        } else {
+          badgeEl.textContent = 'PRACTICE SOLO';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-mono font-extrabold uppercase';
+          botDiffSec.classList.add('hidden');
+          namesSec.classList.remove('hidden');
+          p2Wrap.classList.add('hidden');
+          launchText.textContent = 'Enter Solo Practice Table';
+        }
+        showMenuStep(3);
+      }
+
+      // Wire 3-Step Menu Navigation Buttons
+      document.getElementById('btn-menu-play').addEventListener('click', () => {
+        audio.playUIClick();
+        showMenuStep(2);
+      });
+      document.getElementById('btn-menu-back-1').addEventListener('click', () => {
+        audio.playUIClick();
+        showMenuStep(1);
+      });
+      document.getElementById('btn-menu-back-2').addEventListener('click', () => {
+        audio.playUIClick();
+        showMenuStep(2);
+      });
+
+      document.getElementById('btn-mode-online').addEventListener('click', () => {
+        audio.playUIClick();
+        configureMenuStep3ForMode('online');
+      });
+      document.getElementById('btn-mode-pvp').addEventListener('click', () => {
+        audio.playUIClick();
+        configureMenuStep3ForMode('pvp');
+      });
+      document.getElementById('btn-mode-bot').addEventListener('click', () => {
+        audio.playUIClick();
+        configureMenuStep3ForMode('bot');
+      });
+      document.getElementById('btn-mode-practice').addEventListener('click', () => {
+        audio.playUIClick();
+        configureMenuStep3ForMode('practice');
+      });
+
       function isTouchDevice() {
         return (
           ('ontouchstart' in window) ||
@@ -6227,7 +6897,7 @@ function runAllTests() {
         );
       }
 
-      // Unlock WebAudio & HTML5 Audio on first mobile touch gesture (for iOS Safari & Android Chrome on GitHub Pages)
+      // Unlock WebAudio & HTML5 Audio on first mobile touch gesture
       window.addEventListener('touchstart', () => audio.unlock(), { passive: true, once: true });
       window.addEventListener('touchend', () => audio.unlock(), { passive: true, once: true });
 
@@ -6260,7 +6930,6 @@ function runAllTests() {
       function lockGameCursor() {
         cursorFreeMode = false;
         if (escCursorPill) escCursorPill.classList.add('hidden');
-        // Never request desktop Pointer Lock or hide cursor on mobile/touch devices
         if (isTouchDevice()) {
           document.body.classList.remove('gameplay-cursor-hidden');
           return;
@@ -6350,6 +7019,8 @@ function runAllTests() {
           rulesState: JSON.parse(JSON.stringify(rules.state)),
           unguidedMode,
           gameMode,
+          ruleMode,
+          ballSetKey,
           botDifficulty
         };
       }
@@ -6375,6 +7046,11 @@ function runAllTests() {
         }
         if (snap.rulesState) {
           rules.state = snap.rulesState;
+          ruleMode = rules.state.ruleMode || '8ball';
+          updateRuleModeUI();
+        }
+        if (snap.ballSetKey && snap.ballSetKey !== ballSetKey) {
+          selectBallSet(snap.ballSetKey, false);
         }
         if (typeof snap.unguidedMode === 'boolean') {
           unguidedMode = snap.unguidedMode;
@@ -6407,9 +7083,9 @@ function runAllTests() {
             gameMode = 'pvp';
             if (!mp.matchInitialized) {
               mp.matchInitialized = true;
-              world.setupStandardRack();
-              rules.resetMatch(mp.localName, mp.remoteName, 0, false);
-              rules.state.lastEventBanner = mp.localName + ' vs ' + mp.remoteName + ' — ' + mp.localName + ' Place Behind Line to Break!';
+              world.setupRack(ruleMode);
+              rules.resetMatch(mp.localName, mp.remoteName, 0, false, ruleMode);
+              rules.state.lastEventBanner = mp.localName + ' vs ' + mp.remoteName + ' (' + (ruleMode === '9ball' ? '9-Ball' : '8-Ball') + ') — ' + mp.localName + ' Place Behind Line to Break!';
               shot.aimAngleRad = 0;
               shot.powerNorm = 0.0;
               shot.resetSpin();
@@ -6534,28 +7210,24 @@ function runAllTests() {
           if (statusEl) statusEl.textContent = statusText;
           const badge = document.getElementById('mp-role-badge');
           const hudDot = document.getElementById('online-hud-dot');
-          const onlineBtn = document.getElementById('btn-open-online-hud');
           if (!mp.active) {
             if (badge) {
               badge.textContent = 'OFFLINE';
               badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300';
             }
             if (hudDot) hudDot.classList.add('hidden');
-            if (onlineBtn) onlineBtn.textContent = '🌐 Online';
           } else if (isConn) {
             if (badge) {
               badge.textContent = mp.role === 'host' ? 'HOST (P1)' : 'GUEST (P2)';
               badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
             }
             if (hudDot) hudDot.classList.remove('hidden');
-            if (onlineBtn) onlineBtn.textContent = '🟢 Room ' + mp.roomCode;
           } else {
             if (badge) {
               badge.textContent = 'WAITING';
               badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40';
             }
             if (hudDot) hudDot.classList.remove('hidden');
-            if (onlineBtn) onlineBtn.textContent = '🟡 Room ' + mp.roomCode;
           }
           syncHUD();
         }
@@ -6574,6 +7246,9 @@ function runAllTests() {
 
       function isTargetBallLegal(ballId) {
         if (ballId === null) return false;
+        if (rules.state.ruleMode === '9ball') {
+          return ballId === rules.state.lowestBallId;
+        }
         const cat = BallPhysics.getBallCategory(ballId);
         if (rules.state.isBreakShot || rules.state.tableOpen) {
           return cat !== 'eight';
@@ -6615,9 +7290,13 @@ function runAllTests() {
         }
       }
 
-      function createBallDotHTML(id, clickable = false) {
+      function createBallDotHTML(id, clickable = false, highlightLowest = false) {
         const spec = BALL_COLORS[id] || BALL_COLORS[0];
-        const border = spec.isStripe ? 'border-2 border-white' : 'border border-black/40';
+        const border = highlightLowest
+          ? 'border-2 border-amber-300 ring-2 ring-amber-400/60 scale-110'
+          : spec.isStripe
+          ? 'border-2 border-white'
+          : 'border border-black/40';
         const cursor = clickable ? 'cursor-pointer hover:scale-125 transition-transform' : '';
         return '<span data-ball-id="' + id + '" title="Tap to aim at Ball ' + id + '" class="inline-flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full text-[8px] sm:text-[9px] font-extrabold text-white shadow ' + border + ' ' + cursor + '" style="background:' + spec.hex + '">' + id + '</span>';
       }
@@ -6655,6 +7334,19 @@ function runAllTests() {
         const s = rules.state;
         const p1 = s.players[0];
         const p2 = s.players[1];
+
+        // Keep lowestBallId synced with active table balls in 9-ball mode
+        if (s.ruleMode === '9ball') {
+          s.lowestBallId = world.getLowestActiveBallId();
+        }
+
+        const modePill = document.getElementById('hud-mode-pill');
+        if (modePill) {
+          modePill.textContent = s.ruleMode === '9ball' ? '9-BALL' : '8-BALL';
+          modePill.className = s.ruleMode === '9ball'
+            ? 'px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[10px] font-mono font-extrabold text-amber-300 whitespace-nowrap'
+            : 'px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[10px] font-mono font-extrabold text-emerald-300 whitespace-nowrap';
+        }
 
         document.getElementById('p1-name-label').textContent = p1.name;
 
@@ -6700,7 +7392,6 @@ function runAllTests() {
             bannerText = '🤖 ' + p2NameEl.textContent + ' is thinking & shooting...';
           }
         }
-        // Trigger the faded pop-up status notification whenever status text changes
         showStatusPopup(bannerText, 2700);
 
         const p1Card = document.getElementById('p1-card');
@@ -6720,23 +7411,39 @@ function runAllTests() {
           p1Dot.className = 'w-2.5 h-2.5 shrink-0 rounded-full bg-slate-600';
         }
 
-        const formatGroup = (g) => g ? (g === 'solids' ? 'SOLIDS' : 'STRIPES') : 'OPEN';
-        document.getElementById('p1-group-badge').textContent = gameMode === 'practice' && !p1.group ? 'PRACTICE' : formatGroup(p1.group);
-        document.getElementById('p2-group-badge').textContent = gameMode === 'practice' && !p2.group ? 'FREE' : formatGroup(p2.group);
+        if (s.ruleMode === '9ball') {
+          const lowId = s.lowestBallId || 1;
+          document.getElementById('p1-group-badge').textContent = s.currentPlayerIndex === 0 ? ('TARGET #' + lowId) : '9-BALL';
+          document.getElementById('p2-group-badge').textContent = s.currentPlayerIndex === 1 ? ('TARGET #' + lowId) : '9-BALL';
 
-        const renderPlayerTargets = (group) => {
-          if (!group) {
-            return '<span class="text-[9px] sm:text-[10px] text-slate-300 truncate">Pot Solid (1-7) or Stripe (9-15)</span>';
-          }
-          const rem = rules.getRemainingBallsForGroup(group);
-          if (rem.length === 0) {
-            return createBallDotHTML(8, true) + '<span class="text-[9px] sm:text-[10px] text-amber-300 font-semibold ml-1">Pot 8-Ball!</span>';
-          }
-          return rem.map((id) => createBallDotHTML(id, true)).join('');
-        };
+          const activeNineBalls = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((id) => {
+            const b = world.getBall(id);
+            return b && !b.pocketed;
+          });
+          const nineRowHTML = activeNineBalls.length > 0
+            ? activeNineBalls.map((id) => createBallDotHTML(id, true, id === lowId)).join('')
+            : '<span class="text-[10px] text-amber-300 font-bold">Rack Cleared!</span>';
+          document.getElementById('p1-balls-row').innerHTML = nineRowHTML;
+          document.getElementById('p2-balls-row').innerHTML = nineRowHTML;
+        } else {
+          const formatGroup = (g) => g ? (g === 'solids' ? 'SOLIDS' : 'STRIPES') : 'OPEN';
+          document.getElementById('p1-group-badge').textContent = gameMode === 'practice' && !p1.group ? 'PRACTICE' : formatGroup(p1.group);
+          document.getElementById('p2-group-badge').textContent = gameMode === 'practice' && !p2.group ? 'FREE' : formatGroup(p2.group);
 
-        document.getElementById('p1-balls-row').innerHTML = renderPlayerTargets(p1.group);
-        document.getElementById('p2-balls-row').innerHTML = renderPlayerTargets(p2.group);
+          const renderPlayerTargets = (group) => {
+            if (!group) {
+              return '<span class="text-[9px] sm:text-[10px] text-slate-300 truncate">Pot Solid (1-7) or Stripe (9-15)</span>';
+            }
+            const rem = rules.getRemainingBallsForGroup(group);
+            if (rem.length === 0) {
+              return createBallDotHTML(8, true, true) + '<span class="text-[9px] sm:text-[10px] text-amber-300 font-semibold ml-1">Pot 8-Ball!</span>';
+            }
+            return rem.map((id) => createBallDotHTML(id, true, false)).join('');
+          };
+
+          document.getElementById('p1-balls-row').innerHTML = renderPlayerTargets(p1.group);
+          document.getElementById('p2-balls-row').innerHTML = renderPlayerTargets(p2.group);
+        }
 
         const bihBtn = document.getElementById('btn-ball-in-hand');
         bihBtn.textContent = s.ballInHand ? 'Ball-in-Hand: ON' : 'Ball-in-Hand: OFF';
@@ -6777,14 +7484,23 @@ function runAllTests() {
         updateCueTypeBadgeUI();
         updatePowerUI();
 
-        const allPocketed = [...s.pocketedSolids, ...s.pocketedStripes];
-        if (s.eightBallPocketed) allPocketed.push(8);
+        let allPocketed = [];
+        if (s.ruleMode === '9ball') {
+          allPocketed = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((id) => {
+            const b = world.getBall(id);
+            return b && b.pocketed;
+          });
+        } else {
+          allPocketed = [...s.pocketedSolids, ...s.pocketedStripes];
+          if (s.eightBallPocketed) allPocketed.push(8);
+        }
+
         const tray = document.getElementById('pocketed-tray');
         if (tray) {
           if (allPocketed.length === 0) {
             tray.innerHTML = '<span class="text-[11px] text-slate-500 italic">None yet</span>';
           } else {
-            tray.innerHTML = allPocketed.map((id) => createBallDotHTML(id, false)).join('');
+            tray.innerHTML = allPocketed.map((id) => createBallDotHTML(id, false, false)).join('');
           }
         }
       }
@@ -6801,16 +7517,66 @@ function runAllTests() {
         });
       });
 
-      function updateGuideModeUI() {
-        const modalBtn = document.getElementById('btn-toggle-guide-modal');
-        if (unguidedMode) {
-          modalBtn.textContent = 'Guide: OFF (Unguided)';
-          modalBtn.className = 'py-2 px-2.5 rounded-xl bg-amber-600/30 text-xs font-semibold text-amber-200 border border-amber-500/50 transition';
-        } else {
-          modalBtn.textContent = 'Guide: ON (Guided)';
-          modalBtn.className = 'py-2 px-2.5 rounded-xl bg-emerald-600/30 text-xs font-semibold text-emerald-200 border border-emerald-500/50 transition';
+      function updateRuleModeUI() {
+        const btn8 = document.getElementById('btn-rule-8ball');
+        const btn9 = document.getElementById('btn-rule-9ball');
+        if (btn8 && btn9) {
+          if (ruleMode === '8ball') {
+            btn8.className = 'py-2.5 px-3 rounded-xl text-xs font-extrabold border border-emerald-500 bg-emerald-600/30 text-emerald-200 flex flex-col items-center gap-0.5 transition shadow-md';
+            btn9.className = 'py-2.5 px-3 rounded-xl text-xs font-extrabold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-0.5 transition';
+          } else {
+            btn9.className = 'py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-500 bg-amber-600/30 text-amber-200 flex flex-col items-center gap-0.5 transition shadow-md';
+            btn8.className = 'py-2.5 px-3 rounded-xl text-xs font-extrabold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-0.5 transition';
+          }
         }
       }
+
+      document.getElementById('btn-rule-8ball').addEventListener('click', () => {
+        audio.playUIClick();
+        ruleMode = '8ball';
+        updateRuleModeUI();
+      });
+      document.getElementById('btn-rule-9ball').addEventListener('click', () => {
+        audio.playUIClick();
+        ruleMode = '9ball';
+        updateRuleModeUI();
+      });
+
+      function updateGuideModeUI() {
+        const modalBtn = document.getElementById('btn-toggle-guide-modal');
+        const step3Guided = document.getElementById('btn-step3-guided');
+        const step3Unguided = document.getElementById('btn-step3-unguided');
+        if (unguidedMode) {
+          if (modalBtn) {
+            modalBtn.textContent = 'Guide: OFF (Unguided)';
+            modalBtn.className = 'py-2 px-2.5 rounded-xl bg-amber-600/30 text-xs font-semibold text-amber-200 border border-amber-500/50 transition';
+          }
+          if (step3Unguided && step3Guided) {
+            step3Unguided.className = 'px-3 py-1 rounded-lg text-xs font-bold border border-amber-500 bg-amber-600/30 text-amber-200 transition';
+            step3Guided.className = 'px-3 py-1 rounded-lg text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 transition';
+          }
+        } else {
+          if (modalBtn) {
+            modalBtn.textContent = 'Guide: ON (Guided)';
+            modalBtn.className = 'py-2 px-2.5 rounded-xl bg-emerald-600/30 text-xs font-semibold text-emerald-200 border border-emerald-500/50 transition';
+          }
+          if (step3Unguided && step3Guided) {
+            step3Guided.className = 'px-3 py-1 rounded-lg text-xs font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-200 transition';
+            step3Unguided.className = 'px-3 py-1 rounded-lg text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 transition';
+          }
+        }
+      }
+
+      document.getElementById('btn-step3-guided').addEventListener('click', () => {
+        audio.playUIClick();
+        unguidedMode = false;
+        updateGuideModeUI();
+      });
+      document.getElementById('btn-step3-unguided').addEventListener('click', () => {
+        audio.playUIClick();
+        unguidedMode = true;
+        updateGuideModeUI();
+      });
 
       function updatePowerUI() {
         const pct = Math.round(shot.powerNorm * 100);
@@ -6961,7 +7727,57 @@ function runAllTests() {
       document.getElementById('btn-set-diff-med').addEventListener('click', () => { audio.playUIClick(); setBotDifficulty('medium'); });
       document.getElementById('btn-set-diff-hard').addEventListener('click', () => { audio.playUIClick(); setBotDifficulty('hard'); });
 
-      // 3D Viewport Pointer, Mouse & Multi-Touch (1-Finger Aim / BIH + 2-Finger Pinch-to-Zoom) Controls
+      // Ball Set Selection & Live 3D Texture Update
+      function selectBallSet(setKey, playSound = true) {
+        if (playSound) audio.playUIClick();
+        ballSetKey = setKey;
+        sceneManager.setBallSet(setKey);
+        syncHUD();
+
+        const step3Map = {
+          classic: 'btn-ballset-classic',
+          tournament_tv: 'btn-ballset-tv',
+          neon_cyber: 'btn-ballset-neon',
+          royal_gold: 'btn-ballset-gold'
+        };
+        Object.keys(step3Map).forEach((k) => {
+          const btn = document.getElementById(step3Map[k]);
+          if (!btn) return;
+          if (k === setKey) {
+            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center gap-1 transition shadow-md';
+          } else {
+            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition';
+          }
+        });
+
+        const settingsMap = {
+          classic: 'btn-set-ballset-classic',
+          tournament_tv: 'btn-set-ballset-tv',
+          neon_cyber: 'btn-set-ballset-neon',
+          royal_gold: 'btn-set-ballset-gold'
+        };
+        Object.keys(settingsMap).forEach((k) => {
+          const btn = document.getElementById(settingsMap[k]);
+          if (!btn) return;
+          if (k === setKey) {
+            btn.className = 'py-1.5 px-2 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500';
+          } else {
+            btn.className = 'py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700';
+          }
+        });
+      }
+
+      document.getElementById('btn-ballset-classic').addEventListener('click', () => selectBallSet('classic'));
+      document.getElementById('btn-ballset-tv').addEventListener('click', () => selectBallSet('tournament_tv'));
+      document.getElementById('btn-ballset-neon').addEventListener('click', () => selectBallSet('neon_cyber'));
+      document.getElementById('btn-ballset-gold').addEventListener('click', () => selectBallSet('royal_gold'));
+
+      document.getElementById('btn-set-ballset-classic').addEventListener('click', () => selectBallSet('classic'));
+      document.getElementById('btn-set-ballset-tv').addEventListener('click', () => selectBallSet('tournament_tv'));
+      document.getElementById('btn-set-ballset-neon').addEventListener('click', () => selectBallSet('neon_cyber'));
+      document.getElementById('btn-set-ballset-gold').addEventListener('click', () => selectBallSet('royal_gold'));
+
+      // 3D Viewport Pointer, Mouse & Multi-Touch Controls + Phone Side-Screen Tap Fine Aim
       let draggingCanvas = false;
       let draggingCueBall = false;
       let lastPointerX = 0;
@@ -7123,7 +7939,6 @@ function runAllTests() {
           return;
         }
 
-        // #1: When the player in turn has just shot, wait 1s before entering interactive Free View, then slide left/right/forward/back at locked direction & altitude
         if ((!world.areAllBallsStationary() || postShotFrontViewHoldTimer > 0) && postShotFreeViewActive && !rules.state.gameOver) {
           if (postShotFreeViewDelayTimer > 0) {
             return;
@@ -7142,10 +7957,10 @@ function runAllTests() {
 
         if (!world.areAllBallsStationary() || strikeAnimActive || rules.state.gameOver) return;
 
-        // PC Hold Ctrl + Mouse Pull to charge & Push forward to shoot (scaled by cueSliderSens, default 50%)
+        // PC Hold Ctrl + Mouse Pull to charge & Push forward to shoot
         if (e.ctrlKey || ctrlKeyHeld) {
           isPullingCueSlider = true;
-          const sensScale = cueSliderSens / 0.50; // 1.0 at 50% default
+          const sensScale = cueSliderSens / 0.50;
           if (dy > 0) {
             shot.powerNorm = Math.max(0.0, Math.min(1.0, shot.powerNorm + dy * 0.0042 * sensScale));
             ctrlPeakPower = Math.max(ctrlPeakPower, shot.powerNorm);
@@ -7198,7 +8013,6 @@ function runAllTests() {
             }
           }
         } else if (draggingCanvas) {
-          // Mobile Touch Aiming: normalized around the 5% default so 1-finger touch drag is smooth and responsive on GitHub Pages
           const touchSensScale = aimSens / 0.05;
           shot.adjustAim(dx * 0.0052 * touchSensScale);
           if (Math.abs(dy) > 0 && sceneManager.cameraController.mode === 'pov') {
@@ -7224,7 +8038,7 @@ function runAllTests() {
           }
         }
         spinCardPanel.classList.remove('active-player-glow');
-        if (draggingCanvas && totalDragDist < 8 && world.areAllBallsStationary() && !strikeAnimActive && e && isLocalControlAllowed()) {
+        if (draggingCanvas && totalDragDist < 10 && world.areAllBallsStationary() && !strikeAnimActive && e && isLocalControlAllowed()) {
           if (rules.state.ballInHand) {
             if (e.pointerType === 'mouse' && !cursorFreeMode) {
               confirmBallInHandSpot();
@@ -7244,8 +8058,8 @@ function runAllTests() {
             }
           } else if (document.pointerLockElement !== canvasEl) {
             const pt = getTablePointFromEvent(e);
+            let tappedBall = null;
             if (pt) {
-              let tappedBall = null;
               for (const b of world.balls) {
                 if (b.id === 0 || b.pocketed) continue;
                 if (Math.hypot(pt.x - b.position.x, pt.z - b.position.z) < BALL_RADIUS * 2.5) {
@@ -7253,9 +8067,28 @@ function runAllTests() {
                   break;
                 }
               }
-              if (tappedBall) {
+            }
+            if (tappedBall) {
+              audio.playUIClick();
+              aimAtBallId(tappedBall.id);
+            } else if (e.pointerType !== 'mouse' || isTouchDevice()) {
+              // Requirement #4: When playing on phone, tapping the left or right side of the screen fine-tunes the aim left and right
+              const screenW = window.innerWidth || canvasEl.clientWidth || 800;
+              const fineStep = 0.0028 * (aimSens / 0.05);
+              if (e.clientX < screenW * 0.38) {
                 audio.playUIClick();
-                aimAtBallId(tappedBall.id);
+                shot.adjustAim(-fineStep);
+                showStatusPopup('‹ Fine Aim Left', 900, true);
+                if (mp.active && mp.connected) {
+                  mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
+                }
+              } else if (e.clientX > screenW * 0.62) {
+                audio.playUIClick();
+                shot.adjustAim(fineStep);
+                showStatusPopup('Fine Aim Right ›', 900, true);
+                if (mp.active && mp.connected) {
+                  mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
+                }
               }
             }
           }
@@ -7312,22 +8145,15 @@ function runAllTests() {
         }
       });
 
-      // Dedicated Cue Pull-to-Shoot Slider Interaction (scaled by cueSliderSens, default 50% on PC)
+      // Dedicated Cue Pull-to-Shoot Slider Interaction
       const powerTrack = document.getElementById('power-slider-track');
       let draggingPower = false;
-      let powerStartClientY = 0;
 
-      function updatePowerFromEvent(e, isInitial = false) {
+      function updatePowerFromEvent(e) {
         const rect = powerTrack.getBoundingClientRect();
-        const sensScale = cueSliderSens / 0.50; // 1.0 at 50% default
-        if (isInitial) {
-          powerStartClientY = e.clientY;
-          const rawRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
-          shot.powerNorm = Math.max(0.0, Math.min(1.0, rawRatio * sensScale));
-        } else {
-          const rawRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
-          shot.powerNorm = Math.max(0.0, Math.min(1.0, rawRatio * sensScale));
-        }
+        const sensScale = cueSliderSens / 0.50;
+        const rawRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
+        shot.powerNorm = Math.max(0.0, Math.min(1.0, rawRatio * sensScale));
         updatePowerUI();
         if (mp.active && mp.connected) {
           mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, true);
@@ -7341,11 +8167,11 @@ function runAllTests() {
         draggingPower = true;
         isPullingCueSlider = true;
         try { powerTrack.setPointerCapture(e.pointerId); } catch {}
-        updatePowerFromEvent(e, true);
+        updatePowerFromEvent(e);
       });
 
       powerTrack.addEventListener('pointermove', (e) => {
-        if (draggingPower) updatePowerFromEvent(e, false);
+        if (draggingPower) updatePowerFromEvent(e);
       });
 
       const finishPowerDrag = () => {
@@ -7381,65 +8207,6 @@ function runAllTests() {
         aimAtNearestLegalBall();
       });
 
-      // Optional micro-control button listeners (null-safe since Fine Aim & Zoom dock was removed from HUD)
-      const btnAimLeft = document.getElementById('btn-aim-left');
-      if (btnAimLeft) {
-        btnAimLeft.addEventListener('click', () => {
-          if (!isLocalControlAllowed()) return;
-          audio.playUIClick();
-          shot.adjustAim(-0.0035);
-          if (mp.active && mp.connected) {
-            mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
-          }
-        });
-      }
-
-      const btnAimRight = document.getElementById('btn-aim-right');
-      if (btnAimRight) {
-        btnAimRight.addEventListener('click', () => {
-          if (!isLocalControlAllowed()) return;
-          audio.playUIClick();
-          shot.adjustAim(0.0035);
-          if (mp.active && mp.connected) {
-            mp.sendAimThrottled(shot.aimAngleRad, shot.powerNorm, shot.spin, false);
-          }
-        });
-      }
-
-      const btnPitchDown = document.getElementById('btn-pitch-down');
-      if (btnPitchDown) {
-        btnPitchDown.addEventListener('click', () => {
-          audio.playUIClick();
-          sceneManager.cameraController.adjustLowPovAngle(-3);
-          syncPovAngleUI();
-        });
-      }
-
-      const btnPitchUp = document.getElementById('btn-pitch-up');
-      if (btnPitchUp) {
-        btnPitchUp.addEventListener('click', () => {
-          audio.playUIClick();
-          sceneManager.cameraController.adjustLowPovAngle(3);
-          syncPovAngleUI();
-        });
-      }
-
-      const btnZoomIn = document.getElementById('btn-zoom-in');
-      if (btnZoomIn) {
-        btnZoomIn.addEventListener('click', () => {
-          audio.playUIClick();
-          sceneManager.cameraController.zoomDistance = Math.max(0.50, sceneManager.cameraController.zoomDistance - 0.16);
-        });
-      }
-
-      const btnZoomOut = document.getElementById('btn-zoom-out');
-      if (btnZoomOut) {
-        btnZoomOut.addEventListener('click', () => {
-          audio.playUIClick();
-          sceneManager.cameraController.zoomDistance = Math.min(3.40, sceneManager.cameraController.zoomDistance + 0.16);
-        });
-      }
-
       canvasEl.addEventListener('wheel', (e) => {
         if (isAnyModalOpen()) return;
         e.preventDefault();
@@ -7457,12 +8224,13 @@ function runAllTests() {
       function openMultiplayerLobby() {
         audio.playUIClick();
         unlockGameCursor(false);
+        const p1Val = document.getElementById('input-p1-name').value.trim();
+        if (p1Val) {
+          document.getElementById('input-online-name').value = p1Val;
+        }
         multiplayerModal.style.display = 'flex';
       }
 
-      document.getElementById('btn-open-multiplayer').addEventListener('click', openMultiplayerLobby);
-      const btnOpenOnlineHud = document.getElementById('btn-open-online-hud');
-      if (btnOpenOnlineHud) btnOpenOnlineHud.addEventListener('click', openMultiplayerLobby);
       document.getElementById('btn-close-multiplayer').addEventListener('click', () => {
         audio.playUIClick();
         multiplayerModal.style.display = 'none';
@@ -7496,8 +8264,8 @@ function runAllTests() {
         const url = mp.getShareableUrl();
         if (navigator.share) {
           navigator.share({
-            title: 'Play 3D 8-Ball Pool with Me!',
-            text: 'Join my live 3D 8-Ball Pool table (Room Code: ' + mp.roomCode + '):',
+            title: 'Play 3D 8-Ball & 9-Ball Pool with Me!',
+            text: 'Join my live 3D Pool table (Room Code: ' + mp.roomCode + '):',
             url
           }).catch(() => {});
         } else if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -7589,8 +8357,7 @@ function runAllTests() {
         if (!audio.muted) audio.playUIClick();
       });
 
-      // Match Starter function supporting 'bot', 'pvp', and 'practice' modes,
-      // plus Winner Breaks Next Round & persistent score count on Rematch!
+      // Match Starter function supporting 'bot', 'pvp', and 'practice' modes, plus '8ball' & '9ball'
       function startNewMatch(mode, forceUnguided = null, isRematch = false) {
         audio.playUIClick();
         gameMode = mode;
@@ -7615,26 +8382,27 @@ function runAllTests() {
           p2Name = document.getElementById('input-p2-name').value.trim() || 'Player 2';
         }
 
-        // Determine who breaks: Winner of previous round breaks on Rematch (#10); otherwise Player 1 breaks
         const nextBreaker = (isRematch && rules.state.winnerPlayerIndex !== null)
           ? rules.state.winnerPlayerIndex
           : 0;
 
-        world.setupStandardRack();
+        world.setupRack(ruleMode);
         rules.resetMatch(
           mp.active && mp.connected ? rules.state.players[0].name : p1Name,
           mp.active && mp.connected ? rules.state.players[1].name : p2Name,
           nextBreaker,
-          isRematch
+          isRematch,
+          ruleMode
         );
 
         const breakerName = rules.getCurrentPlayer().name;
+        const modeLabel = ruleMode === '9ball' ? '9-Ball' : '8-Ball';
         if (mode === 'bot') {
-          rules.state.lastEventBanner = breakerName + ' to Break (Breaker Cue) — Place Cue Ball Behind Line';
+          rules.state.lastEventBanner = breakerName + ' to Break (' + modeLabel + ' • Breaker Cue) — Place Cue Ball Behind Line';
         } else if (mode === 'practice') {
-          rules.state.lastEventBanner = 'Solo Practice — Place Cue Ball Behind Line to Break (Breaker Cue)';
+          rules.state.lastEventBanner = 'Solo Practice (' + modeLabel + ') — Place Cue Ball Behind Line to Break';
         } else {
-          rules.state.lastEventBanner = breakerName + ' to Break (Breaker Cue) — Place Behind Line';
+          rules.state.lastEventBanner = breakerName + ' to Break (' + modeLabel + ' • Breaker Cue) — Place Behind Line';
         }
 
         shot.aimAngleRad = 0;
@@ -7656,23 +8424,16 @@ function runAllTests() {
         }
       }
 
-      // Main Menu & Rematch action buttons
-      document.getElementById('btn-start-bot').addEventListener('click', () => {
-        mp.disconnect();
-        startNewMatch('bot', null, false);
+      // Step 3 Launch Button Handler
+      document.getElementById('btn-launch-configured-match').addEventListener('click', () => {
+        if (selectedMenuPlayMode === 'online') {
+          openMultiplayerLobby();
+        } else {
+          mp.disconnect();
+          startNewMatch(selectedMenuPlayMode, null, false);
+        }
       });
-      document.getElementById('btn-start-practice').addEventListener('click', () => {
-        mp.disconnect();
-        startNewMatch('practice', null, false);
-      });
-      document.getElementById('btn-start-match').addEventListener('click', () => {
-        mp.disconnect();
-        startNewMatch('pvp', false, false);
-      });
-      document.getElementById('btn-start-unguided').addEventListener('click', () => {
-        mp.disconnect();
-        startNewMatch('pvp', true, false);
-      });
+
       document.getElementById('btn-restart-match').addEventListener('click', () => startNewMatch(gameMode, null, true));
       document.getElementById('btn-rematch').addEventListener('click', () => startNewMatch(gameMode, null, true));
 
@@ -7686,6 +8447,7 @@ function runAllTests() {
       document.getElementById('btn-pause-menu').addEventListener('click', () => {
         audio.playUIClick();
         unlockGameCursor(false);
+        showMenuStep(1);
         mainMenuModal.style.display = 'flex';
       });
 
@@ -7693,6 +8455,7 @@ function runAllTests() {
         audio.playUIClick();
         unlockGameCursor(false);
         gameoverModal.style.display = 'none';
+        showMenuStep(1);
         mainMenuModal.style.display = 'flex';
       });
 
@@ -7714,7 +8477,7 @@ function runAllTests() {
         if (!isAnyModalOpen()) lockGameCursor();
       });
 
-      // Quality & Felt Settings
+      // Quality, Felt & Environment Settings (Synced across Step 3 Menu and Settings Modal)
       function setQualityTier(tier) {
         audio.playUIClick();
         sceneManager.lighting.applyQuality(tier, sceneManager.renderer);
@@ -7734,40 +8497,57 @@ function runAllTests() {
         audio.playUIClick();
         sceneManager.tableRenderer.setFeltColor(hex);
         const themes = {
-          teal: ['btn-felt-teal', 'bg-teal-900/80 text-teal-100 border-teal-400', 'bg-teal-900/60 text-teal-100 border-slate-700'],
-          green: ['btn-felt-green', 'bg-green-900/80 text-green-100 border-green-400', 'bg-green-900/60 text-green-100 border-slate-700'],
-          blue: ['btn-felt-blue', 'bg-blue-900/80 text-blue-100 border-blue-400', 'bg-blue-900/60 text-blue-100 border-slate-700'],
-          purple: ['btn-felt-purple', 'bg-purple-900/80 text-purple-100 border-purple-400', 'bg-purple-950/80 text-purple-100 border-slate-700'],
-          red: ['btn-felt-red', 'bg-red-900/80 text-red-100 border-red-400', 'bg-red-950/80 text-red-100 border-slate-700'],
-          grey: ['btn-felt-grey', 'bg-slate-600/90 text-slate-100 border-slate-300', 'bg-slate-700/70 text-slate-100 border-slate-700']
+          teal: ['btn-felt-teal', 'btn-step3-felt-teal', 'bg-teal-900/80 text-teal-100 border-teal-400', 'bg-teal-900/60 text-teal-100 border-slate-700'],
+          green: ['btn-felt-green', 'btn-step3-felt-green', 'bg-green-900/80 text-green-100 border-green-400', 'bg-green-900/60 text-green-100 border-slate-700'],
+          blue: ['btn-felt-blue', 'btn-step3-felt-blue', 'bg-blue-900/80 text-blue-100 border-blue-400', 'bg-blue-900/60 text-blue-100 border-slate-700'],
+          purple: ['btn-felt-purple', 'btn-step3-felt-purple', 'bg-purple-900/80 text-purple-100 border-purple-400', 'bg-purple-950/80 text-purple-100 border-slate-700'],
+          red: ['btn-felt-red', 'btn-step3-felt-red', 'bg-red-900/80 text-red-100 border-red-400', 'bg-red-950/80 text-red-100 border-slate-700'],
+          grey: ['btn-felt-grey', 'btn-step3-felt-grey', 'bg-slate-600/90 text-slate-100 border-slate-300', 'bg-slate-700/70 text-slate-100 border-slate-700']
         };
         Object.keys(themes).forEach((k) => {
-          const [id, onCls, offCls] = themes[k];
-          const el = document.getElementById(id);
-          if (el) el.className = 'py-1.5 rounded-lg text-xs font-semibold border ' + (k === activeKey ? onCls : offCls);
+          const [id1, id2, onCls, offCls] = themes[k];
+          const cls = 'py-1.5 rounded-lg text-xs font-semibold border ' + (k === activeKey ? onCls : offCls);
+          const el1 = document.getElementById(id1);
+          const el2 = document.getElementById(id2);
+          if (el1) el1.className = cls;
+          if (el2) el2.className = cls;
         });
       }
-      document.getElementById('btn-felt-teal').addEventListener('click', () => selectFeltTheme('#0d6b4b', 'teal'));
-      document.getElementById('btn-felt-green').addEventListener('click', () => selectFeltTheme('#15803d', 'green'));
-      document.getElementById('btn-felt-blue').addEventListener('click', () => selectFeltTheme('#1e40af', 'blue'));
-      document.getElementById('btn-felt-purple').addEventListener('click', () => selectFeltTheme('#431675', 'purple'));
-      document.getElementById('btn-felt-red').addEventListener('click', () => selectFeltTheme('#7a1616', 'red'));
-      document.getElementById('btn-felt-grey').addEventListener('click', () => selectFeltTheme('#2d3748', 'grey'));
+      ['teal', 'green', 'blue', 'purple', 'red', 'grey'].forEach((key) => {
+        const hexMap = {
+          teal: '#0d6b4b',
+          green: '#15803d',
+          blue: '#1e40af',
+          purple: '#431675',
+          red: '#7a1616',
+          grey: '#2d3748'
+        };
+        const b1 = document.getElementById('btn-felt-' + key);
+        const b2 = document.getElementById('btn-step3-felt-' + key);
+        if (b1) b1.addEventListener('click', () => selectFeltTheme(hexMap[key], key));
+        if (b2) b2.addEventListener('click', () => selectFeltTheme(hexMap[key], key));
+      });
 
       function selectEnvironmentTheme(theme) {
         audio.playUIClick();
         sceneManager.setEnvironment(theme);
         ['lounge', 'club', 'dark'].forEach((k) => {
-          const btn = document.getElementById('btn-env-' + k);
           const active = k === theme;
-          btn.className = active
+          const cls = active
             ? 'py-1.5 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500'
             : 'py-1.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700';
+          const btn1 = document.getElementById('btn-env-' + k);
+          const btn2 = document.getElementById('btn-step3-env-' + k);
+          if (btn1) btn1.className = cls;
+          if (btn2) btn2.className = cls;
         });
       }
-      document.getElementById('btn-env-lounge').addEventListener('click', () => selectEnvironmentTheme('lounge'));
-      document.getElementById('btn-env-club').addEventListener('click', () => selectEnvironmentTheme('club'));
-      document.getElementById('btn-env-dark').addEventListener('click', () => selectEnvironmentTheme('dark'));
+      ['lounge', 'club', 'dark'].forEach((k) => {
+        const b1 = document.getElementById('btn-env-' + k);
+        const b2 = document.getElementById('btn-step3-env-' + k);
+        if (b1) b1.addEventListener('click', () => selectEnvironmentTheme(k));
+        if (b2) b2.addEventListener('click', () => selectEnvironmentTheme(k));
+      });
 
       document.getElementById('slider-table-bright').addEventListener('input', (e) => {
         const val = Number(e.target.value);
@@ -7783,7 +8563,6 @@ function runAllTests() {
         audio.sfxVolume = Number(e.target.value) / 100;
       });
 
-      // #1: Cue Slider Sensitivity (Defaults to 50%)
       document.getElementById('slider-cue-sens').addEventListener('input', (e) => {
         const val = Number(e.target.value);
         cueSliderSens = val / 100;
@@ -7791,7 +8570,6 @@ function runAllTests() {
         if (lbl) lbl.textContent = val + '%';
       });
 
-      // #2: Mouse Look Sensitivity (Defaults to 5%)
       document.getElementById('slider-aim-sens').addEventListener('input', (e) => {
         const val = Number(e.target.value);
         aimSens = val / 100;
@@ -7799,7 +8577,6 @@ function runAllTests() {
         if (lbl) lbl.textContent = val + '%';
       });
 
-      // #11: Low View Vertical Angle (5° to 45°)
       document.getElementById('slider-pov-angle').addEventListener('input', (e) => {
         const val = Number(e.target.value);
         sceneManager.cameraController.setLowPovAngleDeg(val);
@@ -7815,7 +8592,7 @@ function runAllTests() {
         const results = runAllTests();
         const passed = results.filter((r) => r.passed).length;
         document.getElementById('tests-summary-line').textContent =
-          'PASSED: ' + passed + ' / ' + results.length + ' Automated Physics, Rules & Bot AI Tests (960Hz Fixed Solver)';
+          'PASSED: ' + passed + ' / ' + results.length + ' Automated Physics, 8-Ball, 9-Ball & Bot AI Tests (960Hz Solver)';
 
         listEl.innerHTML = results
           .map(
@@ -7844,7 +8621,7 @@ function runAllTests() {
         if (!isAnyModalOpen()) lockGameCursor();
       });
 
-      // Dynamic Device Display Ratio & Viewport Resize Handling (Supports visualViewport & orientationchange)
+      // Dynamic Device Display Ratio & Viewport Resize Handling
       function handleResize() {
         const vv = window.visualViewport;
         const w = vv ? vv.width : window.innerWidth;
@@ -7979,7 +8756,6 @@ function runAllTests() {
         const dt = Math.min(0.1, Math.max(0.001, (now - lastTime) / 1000));
         lastTime = now;
 
-        // Handle Cue Stick Pull-Back & Forward Strike Animation
         let pullOffset = isPullingCueSlider ? shot.powerNorm * 0.25 : 0.014;
         if (strikeAnimActive) {
           strikeAnimTime += dt;
@@ -7988,7 +8764,6 @@ function runAllTests() {
             const progress = strikeAnimTime / strikeDur;
             pullOffset = shot.powerNorm * 0.24 * (1.0 - progress);
           } else {
-            // Strike contact! Pass rules.state.isBreakShot so Breaker Cue delivers boosted power on break only
             strikeAnimActive = false;
             pullOffset = 0;
             const effectivePower = Math.max(0.06, shot.powerNorm);
@@ -8066,7 +8841,7 @@ function runAllTests() {
         }
 
         // --------------------------------------------------------------------
-        // BOT AI AUTOMATED EXECUTION STATE MACHINE (Planning -> Aiming -> Pulling -> Striking)
+        // BOT AI AUTOMATED EXECUTION STATE MACHINE
         // --------------------------------------------------------------------
         if (gameMode === 'bot' && rules.state.currentPlayerIndex === 1 && !rules.state.gameOver && !movingNow && !strikeAnimActive) {
           if (botPhase === 'idle') {
@@ -8127,7 +8902,7 @@ function runAllTests() {
           botPhase = 'idle';
         }
 
-        // Sync 3D Ball Meshes, Smooth Smaller Cue Stick (Breaker or Playing), Ghost Ball, and Camera
+        // Sync 3D Ball Meshes, Cue Stick, Ghost Ball, and Camera
         sceneManager.syncBalls(world);
         sceneManager.updateCueAndAim(
           world,
@@ -8141,7 +8916,6 @@ function runAllTests() {
           rules.state.isBreakShot
         );
 
-        // Automatically switch to Full Front Table View on Opponent's Turn, or Free View after 1s delay on Player's Shot
         if (!movingNow && postShotFrontViewHoldTimer <= 0 && postShotFreeViewActive) {
           postShotFreeViewActive = false;
           postShotFreeViewDelayTimer = 0;
@@ -8165,6 +8939,7 @@ function runAllTests() {
       }
 
       handleResize();
+      updateRuleModeUI();
       updateGuideModeUI();
       setBotDifficulty('medium');
       syncPovAngleUI();
