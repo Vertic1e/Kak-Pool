@@ -578,8 +578,8 @@
             &#127921; Table Cloth Selection
           </label>
           <div class="grid grid-cols-3 gap-2">
-            <button id="btn-step3-felt-blue" type="button" class="py-1.5 rounded-lg bg-blue-900/80 text-xs font-semibold text-blue-100 border border-blue-400">Tournament Blue</button>
-            <button id="btn-step3-felt-green" type="button" class="py-1.5 rounded-lg bg-green-900/60 text-xs font-semibold text-green-100 border border-slate-700">Classic Green</button>
+            <button id="btn-step3-felt-blue" type="button" class="py-1.5 rounded-lg bg-blue-900/60 text-xs font-semibold text-blue-100 border border-slate-700">Tournament Blue</button>
+            <button id="btn-step3-felt-green" type="button" class="py-1.5 rounded-lg bg-green-900/80 text-xs font-semibold text-green-100 border border-green-400">Tournament Green</button>
             <button id="btn-step3-felt-teal" type="button" class="py-1.5 rounded-lg bg-teal-900/60 text-xs font-semibold text-teal-100 border border-slate-700">Club Blue-Green</button>
             <button id="btn-step3-felt-purple" type="button" class="py-1.5 rounded-lg bg-purple-950/80 text-xs font-semibold text-purple-100 border border-slate-700">Dark Purple</button>
             <button id="btn-step3-felt-red" type="button" class="py-1.5 rounded-lg bg-red-950/80 text-xs font-semibold text-red-100 border border-slate-700">Dark Red</button>
@@ -760,8 +760,8 @@
         <label class="block text-xs font-semibold text-slate-300 mb-1.5">Billiard Cloth Felt</label>
         <div class="grid grid-cols-3 gap-2">
           <button id="btn-felt-teal" type="button" class="py-1.5 rounded-lg bg-teal-900/60 text-xs font-semibold text-teal-100 border border-slate-700">Club Blue-Green</button>
-          <button id="btn-felt-green" type="button" class="py-1.5 rounded-lg bg-green-900/60 text-xs font-semibold text-green-100 border border-slate-700">Classic Green</button>
-          <button id="btn-felt-blue" type="button" class="py-1.5 rounded-lg bg-blue-900/80 text-xs font-semibold text-blue-100 border border-blue-400">Tournament Blue</button>
+          <button id="btn-felt-green" type="button" class="py-1.5 rounded-lg bg-green-900/80 text-xs font-semibold text-green-100 border border-green-400">Tournament Green</button>
+          <button id="btn-felt-blue" type="button" class="py-1.5 rounded-lg bg-blue-900/60 text-xs font-semibold text-blue-100 border border-slate-700">Tournament Blue</button>
           <button id="btn-felt-purple" type="button" class="py-1.5 rounded-lg bg-purple-950/80 text-xs font-semibold text-purple-100 border border-slate-700">Dark Purple</button>
           <button id="btn-felt-red" type="button" class="py-1.5 rounded-lg bg-red-950/80 text-xs font-semibold text-red-100 border border-slate-700">Dark Red</button>
           <button id="btn-felt-grey" type="button" class="py-1.5 rounded-lg bg-slate-700/70 text-xs font-semibold text-slate-100 border border-slate-700">Dark Grey</button>
@@ -1189,10 +1189,10 @@ class PocketPhysics {
     const hw = isSnooker ? SNOOKER_TABLE_WIDTH / 2 : POOL_TABLE_WIDTH / 2;
     const cornerOffset = isSnooker ? 0.023 : 0.025;
     const sideOffset = isSnooker ? 0.032 : 0.038;
-    const cornerDrop = isSnooker ? 0.055 : 0.058;
-    const cornerFunnel = isSnooker ? 0.079 : 0.082;
-    const sideDrop = isSnooker ? 0.047 : 0.055;
-    const sideFunnel = isSnooker ? 0.066 : 0.078;
+    const cornerDrop = isSnooker ? 0.055 : 0.057; // Blueprint: 114.3-117.5mm corner mouth (radius ~57.15mm)
+    const cornerFunnel = isSnooker ? 0.079 : 0.085; // Blueprint: corner capture lip region
+    const sideDrop = isSnooker ? 0.047 : 0.063; // Blueprint: 127-130.2mm side mouth (radius ~63.5mm)
+    const sideFunnel = isSnooker ? 0.066 : 0.092; // Blueprint: side pocket capture funnel
 
     return [
       {
@@ -5092,7 +5092,7 @@ class TableRenderer {
   lampBulbMeshes = [];
   lampShadeMeshes = [];
   currentTheme = 'lounge';
-  currentFeltHex = '#102463';
+  currentFeltHex = '#12501e';
   isSnookerTableBuilt = false;
   static feltRefImage = null;
   static feltRefLoaded = false;
@@ -5130,14 +5130,14 @@ class TableRenderer {
 
   static getFeltColorGradingStops(colorHex) {
     const h = (colorHex || '#0a4721').toLowerCase();
-    // Default / Classic Green matches the exact uploaded table2.jpg reference texture:
-    // Center: [103, 188, 106], Mid: [72, 157, 75], Corner: [63, 146, 65]
-    if (h === '#0a4721' || h === '#008000' || h === '#15803d' || h === '#0f7a38' || h === '#067544') {
+    // Tournament Forest Green matches the reference image:
+    // Center: [18, 80, 30], Mid: [15, 66, 25], Corner: [11, 48, 18]
+    if (h === '#12501e' || h === '#0a4721' || h === '#008000' || h === '#15803d' || h === '#0f7a38' || h === '#067544' || h === '#104b1c' || h === '#0f4119') {
       return {
-        center: [103, 188, 106],
-        mid: [72, 157, 75],
-        corner: [63, 146, 65],
-        isNativeGreen: true
+        center: [18, 80, 30],
+        mid: [15, 66, 25],
+        corner: [11, 48, 18],
+        isNativeGreen: false
       };
     }
     if (h === '#063b2a' || h === '#0d6e52') {
@@ -5467,12 +5467,9 @@ class TableRenderer {
     }
     if (feltHexOverride) {
       this.currentFeltHex = feltHexOverride;
-    } else if (isSnooker && (this.currentFeltHex === '#102463' || this.currentFeltHex === '#1e40af')) {
-      // Automatically switch to Club Blue-Green (#063b2a) by default when entering Snooker mode
-      this.currentFeltHex = '#063b2a';
-    } else if (!isSnooker && this.currentFeltHex === '#063b2a') {
-      // Automatically switch to Tournament Blue (#102463) by default for 8-Ball & 9-Ball
-      this.currentFeltHex = '#102463';
+    } else {
+      // Default to Tournament Green (#12501e) for both Pool and Snooker modes
+      this.currentFeltHex = '#12501e';
     }
     this.buildPlayfield(isSnooker);
   }
@@ -5697,15 +5694,29 @@ class TableRenderer {
         this.playfieldGroup.add(c2);
       }
     } else {
-      // Standard 9-ft Pool Table Head String Line & Head/Foot Spots
-      const headLine = new THREE.Mesh(new THREE.PlaneGeometry(0.005, TABLE_WIDTH), lineMat);
+      // =========================================================
+      // REGULATION 9-FT AMERICAN POOL TABLE MARKINGS (WPA spec):
+      // Head string: 0.635m from head cushion nose (= HALF_L - 0.635)
+      // Head spot: centre of head string
+      // Centre spot: centre of table
+      // Foot spot: 0.635m from foot cushion nose (= HALF_L - 0.635 from foot)
+      // Long string: centreline along full table length
+      // Rail sights (diamonds): every TABLE_LENGTH/8 = 0.3175m
+      // =========================================================
+      const headStringX = -HALF_L + 0.635; // 0.635m from head cushion nose
+      const footSpotX   =  HALF_L - 0.635; // 0.635m from foot cushion nose
+
+      // Head string break line (across table)
+      const headLine = new THREE.Mesh(new THREE.PlaneGeometry(0.004, TABLE_WIDTH), lineMat);
       headLine.rotation.x = -Math.PI / 2;
-      headLine.position.set(-HALF_L * 0.5, 0.0006, 0);
+      headLine.position.set(headStringX, 0.0006, 0);
       this.playfieldGroup.add(headLine);
 
-      const spotGeo = new THREE.RingGeometry(0.005, 0.011, 24);
-      const spotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.DoubleSide, transparent: true, opacity: 0.55 });
-      for (const sx of [-HALF_L * 0.5, HALF_L * 0.5]) {
+
+      // Spot dots: head spot, centre spot, foot spot
+      const spotGeo = new THREE.CircleGeometry(0.009, 24);
+      const spotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.DoubleSide, transparent: true, opacity: 0.60 });
+      for (const sx of [headStringX, 0, footSpotX]) {
         const spot = new THREE.Mesh(spotGeo, spotMat);
         spot.rotation.x = -Math.PI / 2;
         spot.position.set(sx, 0.0008, 0);
@@ -5714,10 +5725,10 @@ class TableRenderer {
     }
 
     // 6 Cushion Rubber Banks matching CushionPhysics.SEGMENTS
-    const railH = isSnooker ? 0.036 : 0.038;
-    const railD = 0.048;
-    const cGap = isSnooker ? 0.064 : 0.068;
-    const sGap = isSnooker ? 0.050 : 0.062;
+    const railH = isSnooker ? 0.036 : 0.0363; // Blueprint: cushion nose height ~36.3mm above bed
+    const railD = isSnooker ? 0.045 : 0.050; // Blueprint: cushion rubber width 48-51mm
+    const cGap = isSnooker ? 0.064 : 0.072; // Blueprint: corner pocket jaw gap (114.3-117.5mm mouth)
+    const sGap = isSnooker ? 0.050 : 0.072; // Blueprint: side pocket jaw gap (127-130.2mm mouth)
     const cJawBack = isSnooker ? 0.030 : 0.032;
     const sJawBack = isSnooker ? 0.003 : 0.004;
 
@@ -5805,16 +5816,22 @@ class TableRenderer {
       )
     );
 
-    // Outer Figured Hardwood Cabinet Rails
-    const woodMat = new THREE.MeshStandardMaterial({
-      map: TableRenderer.createWoodTexture(),
-      bumpMap: TableRenderer.createWoodBumpTexture(),
-      bumpScale: 0.0022,
-      roughness: isSnooker ? 0.20 : 0.24,
-      metalness: 0.08
-    });
+    // Outer Cabinet Rails: sleek dark charcoal for American pool table, figured mahogany for Snooker
+    const woodMat = !isSnooker
+      ? new THREE.MeshStandardMaterial({
+          color: 0x121413,
+          roughness: 0.32,
+          metalness: 0.45
+        })
+      : new THREE.MeshStandardMaterial({
+          map: TableRenderer.createWoodTexture(),
+          bumpMap: TableRenderer.createWoodBumpTexture(),
+          bumpScale: 0.0022,
+          roughness: 0.20,
+          metalness: 0.08
+        });
 
-    const frameW = isSnooker ? 0.115 : 0.105;
+    const frameW = isSnooker ? 0.115 : 0.140; // Blueprint: rail width 102-191mm, use 140mm for pool
     const frameH = isSnooker ? 0.040 : 0.042;
     const innerRailZ = HALF_W + railD;
     const outerRailZ = innerRailZ + frameW;
@@ -5855,8 +5872,8 @@ class TableRenderer {
 
     // American Pool tables have 18 Mother-of-Pearl Diamond Sights; British Snooker tables have clean polished mahogany rails with a subtle brass manufacturer nameplate at the baulk end!
     if (!isSnooker) {
-      const sightGeo = new THREE.CircleGeometry(0.0065, 4);
-      const sightMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.18, metalness: 0.55 });
+      const sightGeo = new THREE.CircleGeometry(0.0055, 16);
+      const sightMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.20, metalness: 0.15 });
       for (const signZ of [-1, 1]) {
         for (let i = -3; i <= 3; i++) {
           if (i === 0) continue;
@@ -5900,10 +5917,9 @@ class TableRenderer {
           metalness: 0.78
         })
       : new THREE.MeshStandardMaterial({
-          map: TableRenderer.createLeatherTexture(),
-          color: 0x263244,
-          roughness: 0.42,
-          metalness: 0.45
+          color: 0x111111,
+          roughness: 0.28,
+          metalness: 0.65
         });
 
     for (const p of PocketPhysics.POCKETS) {
@@ -5959,22 +5975,28 @@ class TableRenderer {
 
   buildTableBase(isSnooker = false) {
     const baseGroup = new THREE.Group();
-    const woodMat = new THREE.MeshStandardMaterial({
-      map: TableRenderer.createWoodTexture(),
-      bumpMap: TableRenderer.createWoodBumpTexture(),
-      bumpScale: 0.0022,
-      roughness: 0.28,
-      metalness: 0.08
-    });
+    const woodMat = !isSnooker
+      ? new THREE.MeshStandardMaterial({
+          color: 0x101211,
+          roughness: 0.35,
+          metalness: 0.40
+        })
+      : new THREE.MeshStandardMaterial({
+          map: TableRenderer.createWoodTexture(),
+          bumpMap: TableRenderer.createWoodBumpTexture(),
+          bumpScale: 0.0022,
+          roughness: 0.28,
+          metalness: 0.08
+        });
     const brassMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
       roughness: 0.22,
       metalness: 0.85
     });
 
-    const apronW = TABLE_LENGTH + 0.26;
-    const apronD = TABLE_WIDTH + 0.26;
-    const apronH = 0.17;
+    const apronW = TABLE_LENGTH + (isSnooker ? 0.26 : 0.36); // Blueprint: ~2.90m outside footprint for 9-ft pool
+    const apronD = TABLE_WIDTH + (isSnooker ? 0.26 : 0.38); // Blueprint: ~1.65m outside footprint for 9-ft pool
+    const apronH = isSnooker ? 0.17 : 0.19; // Blueprint: thicker apron for pool rail/slate assembly
     const apronMesh = new THREE.Mesh(new THREE.BoxGeometry(apronW, apronH, apronD), woodMat);
     apronMesh.position.set(0, -0.105, 0);
     apronMesh.castShadow = true;
@@ -5982,26 +6004,26 @@ class TableRenderer {
     baseGroup.add(apronMesh);
 
     // 4 Turned Legs for 9-ft Pool Table; 6 Heavy Turned Mahogany Legs for 12-ft Championship Snooker Table!
-    const legH = 0.58;
-    const legTopR = isSnooker ? 0.075 : 0.065;
-    const legBotR = isSnooker ? 0.056 : 0.048;
+    const legH = isSnooker ? 0.58 : 0.62; // Blueprint: bed height 0.743-0.787m, pool legs longer
+    const legTopR = isSnooker ? 0.075 : 0.068; // Slightly larger turned leg for pool table
+    const legBotR = isSnooker ? 0.056 : 0.052; // Pool leg base radius
     const legGeo = new THREE.CylinderGeometry(legTopR, legBotR, legH, 20);
     const footRingGeo = new THREE.CylinderGeometry(legBotR * 1.15, legBotR * 1.15, 0.035, 20);
 
-    const legX = HALF_L - 0.22;
-    const legZ = HALF_W - 0.08;
+    const legX = isSnooker ? HALF_L - 0.22 : HALF_L - 0.25; // Blueprint: leg inset from table ends
+    const legZ = isSnooker ? HALF_W - 0.08 : HALF_W - 0.10; // Blueprint: leg inset from table sides
     const xPositions = isSnooker ? [-legX, 0, legX] : [-legX, legX];
 
     for (const sx of xPositions) {
       for (const sz of [-legZ, legZ]) {
         const leg = new THREE.Mesh(legGeo, woodMat);
-        leg.position.set(sx, -0.49, sz);
+        leg.position.set(sx, isSnooker ? -0.49 : -0.50, sz); // Blueprint: playing bed ~0.76m above floor
         leg.castShadow = true;
         leg.receiveShadow = true;
         baseGroup.add(leg);
 
         const brassFoot = new THREE.Mesh(footRingGeo, brassMat);
-        brassFoot.position.set(sx, -0.765, sz);
+        brassFoot.position.set(sx, isSnooker ? -0.765 : -0.795, sz); // Brass foot ring at base of leg
         brassFoot.castShadow = true;
         baseGroup.add(brassFoot);
       }
@@ -7267,10 +7289,37 @@ class SceneManager {
       }
     }
 
-    this.smoothedCueTilt += (clearanceTilt - this.smoothedCueTilt) * 0.20;
-
     const perpX = -uZ;
     const perpZ = uX;
+
+    // Obstacle ball clearance: if another ball lies along the cue shaft backward path, elevate the cue to clear it
+    if (world && world.balls) {
+      const cueLen = 1.45;
+      for (const b of world.balls) {
+        if (b.id === cueBall.id || b.pocketed) continue;
+        const relX = b.position.x - cueBall.position.x;
+        const relZ = b.position.z - cueBall.position.z;
+        const distAlongCue = relX * bX + relZ * bZ;
+        if (distAlongCue > 0.015 && distAlongCue < cueLen) {
+          const distPerp = Math.abs(relX * perpX + relZ * perpZ);
+          const rCue = 0.005 + (0.012 - 0.005) * (distAlongCue / cueLen);
+          const bRad = BALL_RADIUS;
+          const colDist = bRad + rCue + 0.004;
+          if (distPerp < colDist) {
+            const chord = Math.sqrt(Math.max(0, bRad * bRad - Math.min(bRad * bRad, distPerp * distPerp)));
+            const ballTop = b.position.y + chord;
+            const reqCenterY = ballTop + rCue + 0.005;
+            const reqTilt = Math.atan2(reqCenterY - this.smoothedTipY, distAlongCue);
+            if (reqTilt > clearanceTilt) {
+              clearanceTilt = Math.max(clearanceTilt, Math.min(1.05, reqTilt));
+            }
+          }
+        }
+      }
+    }
+
+    this.smoothedCueTilt += (clearanceTilt - this.smoothedCueTilt) * 0.28;
+
     const lateralSpinOffset = spinX * BALL_RADIUS * 0.52;
 
     const worldCueX = cueBall.position.x - uX * this.smoothedPullOffset + perpX * lateralSpinOffset;
@@ -9269,22 +9318,22 @@ function runAllTests() {
         audio.playUIClick();
         ruleMode = '8ball';
         updateRuleModeUI();
-        // Default 8-Ball cloth to Tournament Blue (#102463)
-        selectFeltTheme('#102463', 'blue');
+        // Default 8-Ball cloth to Tournament Green (#12501e)
+        selectFeltTheme('#12501e', 'green');
       });
       document.getElementById('btn-rule-9ball').addEventListener('click', () => {
         audio.playUIClick();
         ruleMode = '9ball';
         updateRuleModeUI();
-        // Default 9-Ball cloth to Tournament Blue (#102463)
-        selectFeltTheme('#102463', 'blue');
+        // Default 9-Ball cloth to Tournament Green (#12501e)
+        selectFeltTheme('#12501e', 'green');
       });
       document.getElementById('btn-rule-snooker').addEventListener('click', () => {
         audio.playUIClick();
         ruleMode = 'snooker';
         updateRuleModeUI();
-        // Default Snooker cloth to Club Blue-Green (#063b2a)
-        selectFeltTheme('#063b2a', 'teal');
+        // Default Snooker cloth to Tournament Green (#12501e)
+        selectFeltTheme('#12501e', 'green');
       });
 
       function updateGuideModeUI() {
@@ -10673,7 +10722,7 @@ function runAllTests() {
       ['teal', 'green', 'blue', 'purple', 'red', 'grey'].forEach((key) => {
         const hexMap = {
           teal: '#063b2a',
-          green: '#0a4721',
+          green: '#12501e',
           blue: '#102463',
           purple: '#260b45',
           red: '#470b0b',
