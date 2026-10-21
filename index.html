@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pro 3D Pool" />
+  <meta name="application-name" content="Pro 3D Pool" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#070d14" />
+  <link id="pwa-manifest-link" rel="manifest" />
+  <link id="apple-touch-icon-link" rel="apple-touch-icon" />
+  <link id="favicon-link" rel="icon" type="image/png" />
   <title>Pro 3D 8-Ball &amp; 9-Ball Pool Club — PC &amp; Mobile Billiards</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -183,6 +189,9 @@
         <span id="hud-score-pill" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-[11px] font-mono font-extrabold text-amber-300 whitespace-nowrap">
           &#127942; 0 &ndash; 0
         </span>
+        <button id="btn-fullscreen-hud" type="button" title="Toggle Full Screen Landscape Mode" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-emerald-300 hover:bg-slate-800 active:scale-95 transition whitespace-nowrap">
+          &#x26F6; <span id="hud-fs-label" class="hidden sm:inline">Full Screen</span>
+        </button>
         <button id="btn-open-settings-hud" type="button" title="Game Settings &amp; Sensitivities" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-slate-200 hover:bg-slate-800 active:scale-95 transition whitespace-nowrap">
           &#9881; <span class="hidden sm:inline">Settings</span>
         </button>
@@ -357,6 +366,18 @@
           <span>SETTING</span>
         </button>
 
+        <!-- Mobile Shortcut Install & Full Screen Quick Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button id="btn-open-install-pwa" type="button" class="py-2.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600/35 to-indigo-600/35 hover:from-sky-500/45 hover:to-indigo-500/45 text-sky-200 font-bold text-xs sm:text-sm border border-sky-400/40 shadow active:scale-98 transition flex items-center justify-center gap-2">
+            <span>&#128242;</span>
+            <span>Install Mobile Shortcut</span>
+          </button>
+          <button id="btn-menu-fullscreen" type="button" class="py-2.5 px-4 rounded-2xl bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-200 font-bold text-xs sm:text-sm border border-emerald-400/40 shadow active:scale-98 transition flex items-center justify-center gap-2">
+            <span>&#x26F6;</span>
+            <span id="menu-fs-label">Play Full Screen</span>
+          </button>
+        </div>
+
         <!-- Quick Footer Actions on First Menu -->
         <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-800/80">
           <button id="btn-restart-match" type="button" class="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-semibold text-xs border border-slate-700/80 transition">
@@ -513,43 +534,35 @@
           </div>
         </div>
 
-        <!-- 4. Ball Selection: Color Set & Style -->
+        <!-- 4. Ball Selection: Color Set & Style (Classic + 3 Uploaded Custom Sets) -->
         <div id="step3-ballset-section" class="p-3 rounded-2xl bg-slate-900/85 border border-slate-700/80">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-sky-300 mb-2">
             &#127912; Ball Set &amp; Color Style
           </label>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button id="btn-ballset-classic" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center gap-1 transition">
-              <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+            <button id="btn-ballset-classic" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center justify-between gap-1 transition shadow-md">
+              <div class="w-11 h-11 rounded-lg bg-slate-950/90 border border-slate-700 flex items-center justify-center gap-1 p-1">
+                <span class="w-3 h-3 rounded-full bg-yellow-500 border border-white/60"></span>
+                <span class="w-3 h-3 rounded-full bg-blue-600 border border-white/60"></span>
+                <span class="w-3 h-3 rounded-full bg-red-600 border border-white/60"></span>
               </div>
-              <span>Classic Pro</span>
+              <span class="leading-tight">Classic Pro</span>
+              <span class="text-[9px] font-normal text-slate-300/80">Standard Ivory</span>
             </button>
-            <button id="btn-ballset-tv" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
-              <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-700"></span>
-              </div>
-              <span>Tournament TV</span>
+            <button id="btn-ballset-tv" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center justify-between gap-1 transition">
+              <img src="data:image/jpeg;base64,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" alt="Ropa Triangle Ball Set" class="w-11 h-11 rounded-lg object-cover border border-slate-600 shadow-sm" />
+              <span class="leading-tight">Ropa Triangle</span>
+              <span class="text-[9px] font-normal text-slate-400">Triangle Badge</span>
             </button>
-            <button id="btn-ballset-neon" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
-              <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-500"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-lime-400"></span>
-              </div>
-              <span>Neon Cyber</span>
+            <button id="btn-ballset-neon" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center justify-between gap-1 transition">
+              <img src="data:image/jpeg;base64,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" alt="Black-Ring Pearl Ball Set" class="w-11 h-11 rounded-lg object-cover border border-slate-600 shadow-sm" />
+              <span class="leading-tight">Black-Ring Pearl</span>
+              <span class="text-[9px] font-normal text-slate-400">Pearl &amp; Dark Ring</span>
             </button>
-            <button id="btn-ballset-gold" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition">
-              <div class="flex items-center gap-1">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                <span class="w-2.5 h-2.5 rounded-full bg-purple-700"></span>
-              </div>
-              <span>Royal Gold</span>
+            <button id="btn-ballset-gold" type="button" class="py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center justify-between gap-1 transition">
+              <img src="data:image/jpeg;base64,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" alt="Marble Swirl Ball Set" class="w-11 h-11 rounded-lg object-cover border border-slate-600 shadow-sm" />
+              <span class="leading-tight">Marble Swirl</span>
+              <span class="text-[9px] font-normal text-slate-400">Swirled Resin</span>
             </button>
           </div>
         </div>
@@ -634,14 +647,46 @@
         </div>
       </div>
 
+      <!-- Mobile Fullscreen & Home Screen Shortcut Controls -->
+      <div class="mb-3.5 p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/35 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-300">&#128242; Mobile Full Screen &amp; Shortcut</span>
+          <button id="btn-toggle-auto-fullscreen" type="button" class="px-2.5 py-0.5 rounded-lg bg-emerald-600/30 border border-emerald-500/50 text-[10px] font-bold text-emerald-200 transition">
+            Auto Full Screen: ON
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-settings-fullscreen" type="button" class="py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+            <span>&#x26F6;</span>
+            <span id="settings-fs-label">Enter Full Screen</span>
+          </button>
+          <button id="btn-settings-install-pwa" type="button" class="py-2 px-2.5 rounded-xl bg-sky-600/35 hover:bg-sky-600/50 text-sky-200 border border-sky-400/50 font-bold text-xs transition flex items-center justify-center gap-1.5">
+            <span>&#128242;</span>
+            <span>Add to Home Screen</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Ball Set & Style Selector in Settings -->
       <div class="mb-3.5">
         <label class="block text-xs font-semibold text-slate-300 mb-1.5">Ball Set &amp; Color Style</label>
         <div class="grid grid-cols-2 gap-2">
-          <button id="btn-set-ballset-classic" type="button" class="py-1.5 px-2 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500">Classic Pro</button>
-          <button id="btn-set-ballset-tv" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Tournament TV</button>
-          <button id="btn-set-ballset-neon" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Neon Cyber</button>
-          <button id="btn-set-ballset-gold" type="button" class="py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700">Royal Gold</button>
+          <button id="btn-set-ballset-classic" type="button" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500 flex items-center gap-2">
+            <span class="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 via-blue-600 to-red-600 shrink-0 border border-white/50"></span>
+            <span class="truncate">Classic Pro</span>
+          </button>
+          <button id="btn-set-ballset-tv" type="button" class="py-1.5 px-2.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center gap-2">
+            <img src="data:image/jpeg;base64,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" alt="Ropa Triangle" class="w-5 h-5 rounded object-cover shrink-0 border border-slate-600" />
+            <span class="truncate">Ropa Triangle</span>
+          </button>
+          <button id="btn-set-ballset-neon" type="button" class="py-1.5 px-2.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center gap-2">
+            <img src="data:image/jpeg;base64,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" alt="Black-Ring Pearl" class="w-5 h-5 rounded object-cover shrink-0 border border-slate-600" />
+            <span class="truncate">Black-Ring Pearl</span>
+          </button>
+          <button id="btn-set-ballset-gold" type="button" class="py-1.5 px-2.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center gap-2">
+            <img src="data:image/jpeg;base64,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" alt="Marble Swirl" class="w-5 h-5 rounded object-cover shrink-0 border border-slate-600" />
+            <span class="truncate">Marble Swirl</span>
+          </button>
         </div>
       </div>
 
@@ -757,6 +802,74 @@
         <button id="btn-open-tests-hud" type="button" class="py-2 px-2 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 text-xs font-semibold text-violet-200 border border-violet-500/40">
           Tests (15)
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Shortcut & Full Screen Installation Modal -->
+  <div id="install-pwa-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-5 shadow-2xl border border-sky-500/40 max-h-[92dvh] overflow-y-auto custom-scrollbar space-y-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Mobile Web App &bull; Fullscreen PWA</span>
+          <h2 class="text-base sm:text-lg font-extrabold text-white">Install Shortcut &amp; Play Full Screen</h2>
+        </div>
+        <button id="btn-close-install-pwa" type="button" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
+          Close
+        </button>
+      </div>
+
+      <!-- Live Display Mode Status Banner -->
+      <div id="pwa-status-banner" class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-slate-200 flex items-center justify-between gap-2">
+        <span id="pwa-status-text" class="font-semibold text-sky-300">Ready for Full Screen &amp; Home Screen Shortcut</span>
+        <span id="pwa-mode-badge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold shrink-0">PWA READY</span>
+      </div>
+
+      <!-- Primary Instant Action Buttons -->
+      <div class="grid grid-cols-1 gap-2">
+        <button id="btn-modal-fullscreen" type="button" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm shadow-lg border border-emerald-400/50 active:scale-98 transition flex items-center justify-center gap-2">
+          <span class="text-base">&#x26F6;</span>
+          <span id="modal-fs-btn-text">Enter Full Screen Landscape Now</span>
+        </button>
+
+        <button id="btn-trigger-pwa-install" type="button" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-lg border border-sky-400/50 active:scale-98 transition flex items-center justify-center gap-2">
+          <span class="text-base">&#128242;</span>
+          <span id="pwa-install-btn-text">Install App Shortcut to Home Screen</span>
+        </button>
+
+        <button id="btn-download-standalone-html" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs border border-slate-600 transition flex items-center justify-center gap-2">
+          <span>&#128190;</span>
+          <span>Download Standalone Game File (.html)</span>
+        </button>
+      </div>
+
+      <!-- Step-by-Step Instructions for Android & iOS -->
+      <div class="space-y-2.5 text-xs">
+        <div id="pwa-guide-android" class="p-3 rounded-2xl bg-slate-900/85 border border-emerald-500/30 space-y-1.5">
+          <div class="font-extrabold text-emerald-300 flex items-center justify-between">
+            <span>&#129302; Android (Chrome / Samsung / Edge)</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200">Full Screen</span>
+          </div>
+          <ol class="list-decimal list-inside text-slate-300 space-y-1 text-[11px] leading-relaxed">
+            <li>Open this game in <strong>Chrome</strong> (or tap <strong>Install App Shortcut</strong> above).</li>
+            <li>Tap the browser menu button <strong>&#8942;</strong> in the top-right corner.</li>
+            <li>Tap <strong>&ldquo;Add to Home screen&rdquo;</strong> or <strong>&ldquo;Install app&rdquo;</strong>.</li>
+            <li>Launch <strong>Pro 3D Pool</strong> from your phone's home screen to play in <strong>100% Full Screen Landscape Mode</strong> with no address bar!</li>
+          </ol>
+        </div>
+
+        <div id="pwa-guide-ios" class="p-3 rounded-2xl bg-slate-900/85 border border-sky-500/30 space-y-1.5">
+          <div class="font-extrabold text-sky-300 flex items-center justify-between">
+            <span>&#127822; iPhone &amp; iPad (Safari)</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200">Home Screen App</span>
+          </div>
+          <ol class="list-decimal list-inside text-slate-300 space-y-1 text-[11px] leading-relaxed">
+            <li>Open this game URL in <strong>Safari</strong> on your iPhone or iPad.</li>
+            <li>Tap the <strong>Share</strong> icon <strong>&#x2191;</strong> on the Safari toolbar.</li>
+            <li>Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong>, then tap <strong>Add</strong>.</li>
+            <li>Open <strong>Pro 3D Pool</strong> from your Home Screen &mdash; it launches as a standalone <strong>Full Screen</strong> app with zero Safari toolbars!</li>
+          </ol>
+        </div>
       </div>
     </div>
   </div>
@@ -3423,91 +3536,94 @@ const BALL_STYLE_SETS = {
       15: '#7f1d1d'
     }
   },
+  // Uploaded Set 1 (1000027339.jpg): Ropa Triangle Medallion Set
   tournament_tv: {
     key: 'tournament_tv',
-    label: 'Tournament TV',
-    baseCoat: '#fcfbf7',
-    cueBaseRgb: [252, 251, 247],
-    cueDotRgb: [225, 29, 72],
-    medallionBg: '#ffffff',
-    medallionRing: '#dc2626',
-    medallionText: '#090d16',
-    stripeStyle: 'tv_bordered',
+    label: 'Ropa Triangle',
+    baseCoat: '#f3eed4',
+    cueBaseRgb: [237, 230, 196],
+    cueDotRgb: [24, 90, 143],
+    medallionBg: '#f5f1d8',
+    medallionRing: '#0c0f14',
+    medallionText: '#0c0f14',
+    stripeStyle: 'ropa_triangle',
     colors: {
-      0: '#fcfbf7',
-      1: '#facc15',
-      2: '#0284c7',
-      3: '#ef4444',
-      4: '#ec4899', // TV Pink 4-ball
-      5: '#f97316',
-      6: '#10b981',
-      7: '#a16207', // TV Camel/Tan 7-ball
-      8: '#090d16',
-      9: '#facc15',
-      10: '#0284c7',
-      11: '#ef4444',
-      12: '#ec4899', // TV Pink 12-ball
-      13: '#f97316',
-      14: '#10b981',
-      15: '#a16207'  // TV Camel/Tan 15-ball
+      0: '#ede6c4',
+      1: '#f2a30b',
+      2: '#0f62ac',
+      3: '#dc2626',
+      4: '#7d5196',
+      5: '#f2511b',
+      6: '#877d6c', // Taupe / Warm Stone Grey 6-ball
+      7: '#22b59b', // Turquoise / Mint Teal 7-ball
+      8: '#0c0f14',
+      9: '#f2a30b',
+      10: '#0f62ac',
+      11: '#dc2626',
+      12: '#7d5196',
+      13: '#f2511b',
+      14: '#877d6c', // Taupe / Warm Stone Grey 14-ball
+      15: '#22b59b'  // Turquoise / Mint Teal 15-ball
     }
   },
+  // Uploaded Set 2 (1000027340.jpg): Black-Ring Pearl Marbled Set
   neon_cyber: {
     key: 'neon_cyber',
-    label: 'Neon Cyber',
-    baseCoat: '#0f172a',
-    cueBaseRgb: [22, 32, 54],
-    cueDotRgb: [34, 211, 238],
-    medallionBg: '#090d16',
-    medallionRing: '#38bdf8',
-    medallionText: '#f8fafc',
-    stripeStyle: 'neon_ring',
+    label: 'Black-Ring Pearl',
+    baseCoat: '#f7f5f0',
+    cueBaseRgb: [248, 246, 242],
+    cueDotRgb: [190, 35, 45],
+    medallionBg: '#0d1117',
+    medallionRing: '#ffffff',
+    medallionText: '#ffffff',
+    stripeStyle: 'black_ring_pearl',
     colors: {
-      0: '#38bdf8',
-      1: '#fde047',
-      2: '#00f0ff',
-      3: '#ff2a85',
-      4: '#c084fc',
-      5: '#ff7b00',
-      6: '#00ff9d',
-      7: '#f43f5e',
-      8: '#64748b',
-      9: '#fde047',
-      10: '#00f0ff',
-      11: '#ff2a85',
-      12: '#c084fc',
-      13: '#ff7b00',
-      14: '#00ff9d',
-      15: '#f43f5e'
+      0: '#f8f6f2',
+      1: '#f7a40c',
+      2: '#1266d4',
+      3: '#e62429',
+      4: '#52247c',
+      5: '#f76b15',
+      6: '#14854e',
+      7: '#9e1922',
+      8: '#26272b',
+      9: '#f7a40c',
+      10: '#1266d4',
+      11: '#e62429',
+      12: '#52247c',
+      13: '#f76b15',
+      14: '#14854e',
+      15: '#9e1922'
     }
   },
+  // Uploaded Set 3 (1000027341.jpg): Liquid Marble Swirl Resin Set
   royal_gold: {
     key: 'royal_gold',
-    label: 'Royal Gold',
-    baseCoat: '#faf6eb',
-    cueBaseRgb: [250, 246, 235],
-    cueDotRgb: [180, 130, 25],
-    medallionBg: '#fffbeb',
-    medallionRing: '#d4af37',
-    medallionText: '#1c1917',
-    stripeStyle: 'gold_trimmed',
+    label: 'Marble Swirl',
+    baseCoat: '#f9f6ee',
+    cueBaseRgb: [247, 243, 232],
+    cueDotRgb: [185, 38, 38],
+    medallionBg: '#faf8f2',
+    medallionRing: 'transparent',
+    medallionText: '#111827',
+    stripeStyle: 'marble_swirl',
     colors: {
-      0: '#fef3c7',
-      1: '#d97706',
-      2: '#1e3a8a',
-      3: '#991b1b',
-      4: '#581c87',
-      5: '#c2410c',
-      6: '#065f46',
-      7: '#451a03',
-      8: '#18181b',
-      9: '#d97706',
-      10: '#1e3a8a',
-      11: '#991b1b',
-      12: '#581c87',
-      13: '#c2410c',
-      14: '#065f46',
-      15: '#451a03'
+      0: '#f7f3e8',
+      1: '#f59e0b',
+      2: '#1849b8',
+      3: '#e12836',
+      4: '#3b2782',
+      5: '#f46d25',
+      6: '#0b875b',
+      7: '#7a1c1c',
+      8: '#14171f',
+      9: '#f59e0b',
+      10: '#1849b8',
+      11: '#e12836',
+      12: '#3b2782',
+      13: '#f46d25',
+      14: '#0b875b',
+      15: '#7a1c1c'
     }
   }
 };
@@ -3546,9 +3662,204 @@ class BallTextureBuilder {
   }
 
   /**
+   * Helper to draw a smooth rounded equilateral triangle centered at (cx, cy)
+   * matching the Ropa Triangle ball set (1000027339.jpg).
+   */
+  static traceRoundedTriangle(
+    ctx,
+    cx,
+    cy,
+    radius,
+    cornerRadius
+  ) {
+    // Vertices of an upward-pointing equilateral triangle, slightly shifted down so visual centroid aligns with text
+    const cyOffset = cy + radius * 0.12;
+    const angles = [-Math.PI / 2, Math.PI / 6, (5 * Math.PI) / 6];
+    const pts = angles.map((a) => ({
+      x: cx + Math.cos(a) * radius,
+      y: cyOffset + Math.sin(a) * radius
+    }));
+
+    ctx.beginPath();
+    const mid01x = (pts[0].x + pts[1].x) * 0.5;
+    const mid01y = (pts[0].y + pts[1].y) * 0.5;
+    ctx.moveTo(mid01x, mid01y);
+    ctx.arcTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, cornerRadius);
+    ctx.arcTo(pts[2].x, pts[2].y, pts[0].x, pts[0].y, cornerRadius);
+    ctx.arcTo(pts[0].x, pts[0].y, pts[1].x, pts[1].y, cornerRadius);
+    ctx.closePath();
+  }
+
+  /**
+   * Renders pearlescent / metallic marble clouds inside the current clip region
+   * matching Uploaded Set 2 (1000027340.jpg).
+   */
+  static renderPearlCoat(
+    ctx,
+    id,
+    baseHex,
+    yMin,
+    yMax
+  ) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, yMin, 512, yMax - yMin);
+    ctx.clip();
+
+    ctx.fillStyle = baseHex;
+    ctx.fillRect(0, yMin, 512, yMax - yMin);
+
+    const seed = id * 37.3;
+    // Soft dark depth clouds
+    for (let i = 0; i < 14; i++) {
+      const u = ((i * 73 + seed * 11) % 512);
+      const v = yMin + ((i * 53 + seed * 19) % Math.max(1, yMax - yMin));
+      const r = 38 + (i % 4) * 18;
+      for (const offsetX of [-512, 0, 512]) {
+        const grad = ctx.createRadialGradient(u + offsetX, v, 2, u + offsetX, v, r);
+        grad.addColorStop(0, 'rgba(0, 0, 0, 0.28)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(u + offsetX - r, v - r, r * 2, r * 2);
+      }
+    }
+
+    // Bright pearlescent shimmer clouds & diagonal metallic veins
+    for (let i = 0; i < 18; i++) {
+      const u = ((i * 97 + seed * 23) % 512);
+      const v = yMin + ((i * 41 + seed * 31) % Math.max(1, yMax - yMin));
+      const r = 28 + (i % 5) * 14;
+      for (const offsetX of [-512, 0, 512]) {
+        const grad = ctx.createRadialGradient(u + offsetX, v, 1, u + offsetX, v, r);
+        grad.addColorStop(0, id === 8 ? 'rgba(220, 225, 235, 0.34)' : 'rgba(255, 255, 255, 0.36)');
+        grad.addColorStop(0.55, id === 8 ? 'rgba(160, 170, 185, 0.14)' : 'rgba(255, 255, 255, 0.12)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(u + offsetX - r, v - r, r * 2, r * 2);
+      }
+    }
+
+    // Subtle pearlescent silk waves wrapping seamlessly across 0..512
+    for (let w = 0; w < 6; w++) {
+      ctx.beginPath();
+      const baseY = yMin + ((w + 0.5) / 6) * (yMax - yMin);
+      const amp = 14 + (w % 3) * 8;
+      const phase = seed + w * 1.3;
+      for (let x = 0; x <= 512; x += 8) {
+        const rad = (x / 512) * Math.PI * 2;
+        const y = baseY + Math.sin(rad * 2 + phase) * amp + Math.cos(rad * 3 - phase) * (amp * 0.45);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = w % 2 === 0 ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.16)';
+      ctx.lineWidth = 10 + (w % 3) * 4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Renders dramatic fluid liquid-resin marble swirl ribbons inside the current clip region
+   * matching Uploaded Set 3 (1000027341.jpg).
+   */
+  static renderMarbleSwirlCoat(
+    ctx,
+    id,
+    baseHex,
+    yMin,
+    yMax
+  ) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, yMin, 512, yMax - yMin);
+    ctx.clip();
+
+    ctx.fillStyle = baseHex;
+    ctx.fillRect(0, yMin, 512, yMax - yMin);
+
+    const seed = id * 19.7 + 3.1;
+    const spanY = yMax - yMin;
+
+    // 1. Deep rich shadow veins
+    for (let r = 0; r < 7; r++) {
+      ctx.beginPath();
+      const centerY = yMin + ((r + 0.5) / 7) * spanY;
+      const p1 = seed + r * 1.15;
+      const p2 = seed * 0.7 - r * 1.65;
+      for (let x = 0; x <= 512; x += 6) {
+        const t = (x / 512) * Math.PI * 2;
+        const dy =
+          Math.sin(t * 2 + p1) * (spanY * 0.22) +
+          Math.cos(t * 3 + p2) * (spanY * 0.14) +
+          Math.sin(t * 5 - p1) * 8;
+        const y = centerY + dy;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.28)';
+      ctx.lineWidth = 12 + (r % 3) * 5;
+      ctx.stroke();
+    }
+
+    // 2. Bold creamy-white poured resin marble ribbons (characteristic of 1000027341.jpg)
+    for (let r = 0; r < 11; r++) {
+      ctx.beginPath();
+      const centerY = yMin + ((r + 0.4) / 11) * spanY;
+      const p1 = seed * 1.3 + r * 2.05;
+      const p2 = seed * 0.9 + r * 1.4;
+      for (let x = 0; x <= 512; x += 6) {
+        const t = (x / 512) * Math.PI * 2;
+        const warp = Math.sin(t * 2 + p2) * 0.65;
+        const dy =
+          Math.sin(t * 2 + warp + p1) * (spanY * 0.24) +
+          Math.cos(t * 4 - p2) * (spanY * 0.11) +
+          Math.sin(t * 6 + p1) * 5;
+        const y = centerY + dy;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      const isBrightVein = r % 2 === 0;
+      ctx.strokeStyle = isBrightVein
+        ? 'rgba(253, 250, 242, 0.78)'
+        : 'rgba(255, 248, 231, 0.38)';
+      ctx.lineWidth = isBrightVein ? (7 + (r % 3) * 4) : (14 + (r % 4) * 4);
+      ctx.stroke();
+
+      // Crisp inner core ribbon
+      if (isBrightVein) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.lineWidth = 2.8;
+        ctx.stroke();
+      }
+    }
+
+    // 3. Re-blend fine base color filaments over the white veins for authentic swirled depth
+    for (let r = 0; r < 6; r++) {
+      ctx.beginPath();
+      const centerY = yMin + ((r + 0.6) / 6) * spanY;
+      const p1 = seed * 1.8 - r * 1.9;
+      for (let x = 0; x <= 512; x += 6) {
+        const t = (x / 512) * Math.PI * 2;
+        const y = centerY + Math.cos(t * 3 + p1) * (spanY * 0.20) + Math.sin(t * 5 - p1) * 9;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = baseHex;
+      ctx.globalAlpha = 0.62;
+      ctx.lineWidth = 6 + (r % 3) * 3;
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+    }
+
+    ctx.restore();
+  }
+
+  /**
    * Generates an equirectangular 512x256 texture canvas for a billiard ball
    * with accurate stripe geometry, dual number medallions, and 3D-projected
-   * evenly spaced octahedral measles dots on the cue ball.
+   * cue ball markings across all 4 ball sets.
    */
   static createBallCanvas(id, setKey = BallTextureBuilder.currentSetKey) {
     const canvas = document.createElement('canvas');
@@ -3563,7 +3874,36 @@ class BallTextureBuilder {
     ctx.fillStyle = styleSet.baseCoat;
     ctx.fillRect(0, 0, 512, 256);
 
+    // Subtle pearl or marble base coat on polar caps when applicable
+    if (styleSet.stripeStyle === 'black_ring_pearl' && (id === 0 || spec.isStripe)) {
+      BallTextureBuilder.renderPearlCoat(ctx, id + 20, styleSet.baseCoat, 0, 256);
+    } else if (styleSet.stripeStyle === 'marble_swirl' && id === 0) {
+      BallTextureBuilder.renderMarbleSwirlCoat(ctx, 0, '#e8e2d0', 0, 256);
+      return canvas;
+    }
+
     if (id === 0) {
+      if (styleSet.stripeStyle === 'ropa_triangle') {
+        // Ropa Cue Ball (1000027339.jpg): Warm cream-ivory cue ball with blue triangles
+        ctx.fillStyle = '#ede6c4';
+        ctx.fillRect(0, 0, 512, 256);
+        const triPositions = [
+          [64, 128], [192, 128], [320, 128], [448, 128],
+          [128, 64], [384, 64], [128, 192], [384, 192]
+        ];
+        ctx.fillStyle = '#185a8f';
+        for (const [tx, ty] of triPositions) {
+          BallTextureBuilder.traceRoundedTriangle(ctx, tx, ty, 13, 2.5);
+          ctx.fill();
+        }
+        return canvas;
+      }
+
+      if (styleSet.stripeStyle === 'black_ring_pearl') {
+        // Pearlescent white cue ball from 1000027340.jpg
+        return canvas;
+      }
+
       const imgData = ctx.getImageData(0, 0, 512, 256);
       const data = imgData.data;
 
@@ -3639,62 +3979,97 @@ class BallTextureBuilder {
       return canvas;
     }
 
-    if (!spec.isStripe) {
-      if (styleSet.stripeStyle === 'neon_ring') {
-        // Dark carbon body with glowing wide color band and bright neon border lines
-        ctx.fillStyle = '#0b1120';
-        ctx.fillRect(0, 0, 512, 256);
-        ctx.fillStyle = ballHex;
-        ctx.fillRect(0, 28, 512, 200);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 28, 512, 4);
-        ctx.fillRect(0, 224, 512, 4);
-      } else {
-        ctx.fillStyle = ballHex;
-        ctx.fillRect(0, 0, 512, 256);
-        if (styleSet.stripeStyle === 'gold_trimmed') {
-          ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
-          ctx.fillRect(0, 42, 512, 4);
-          ctx.fillRect(0, 210, 512, 4);
-        }
-      }
-    } else {
-      // Equatorial color stripe band (occupies middle 54% of height)
-      ctx.fillStyle = ballHex;
-      ctx.fillRect(0, 58, 512, 140);
+    // Object balls 1..15 surface coat (solid or equatorial stripe)
+    const yStart = spec.isStripe ? 58 : 0;
+    const yEnd = spec.isStripe ? 198 : 256;
 
-      if (styleSet.stripeStyle === 'tv_bordered') {
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 54, 512, 4);
-        ctx.fillRect(0, 198, 512, 4);
-      } else if (styleSet.stripeStyle === 'neon_ring') {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 55, 512, 5);
-        ctx.fillRect(0, 196, 512, 5);
-      } else if (styleSet.stripeStyle === 'gold_trimmed') {
-        ctx.fillStyle = '#d4af37';
-        ctx.fillRect(0, 54, 512, 5);
-        ctx.fillRect(0, 197, 512, 5);
-      }
+    if (styleSet.stripeStyle === 'black_ring_pearl') {
+      BallTextureBuilder.renderPearlCoat(ctx, id, ballHex, yStart, yEnd);
+    } else if (styleSet.stripeStyle === 'marble_swirl') {
+      BallTextureBuilder.renderMarbleSwirlCoat(ctx, id, ballHex, yStart, yEnd);
+    } else {
+      ctx.fillStyle = ballHex;
+      ctx.fillRect(0, yStart, 512, yEnd - yStart);
     }
 
     // Draw dual opposing number medallions at (128, 128) and (384, 128)
     for (const cx of [128, 384]) {
       const cy = 128;
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-      ctx.fillStyle = styleSet.medallionBg;
-      ctx.fill();
-      ctx.lineWidth = styleSet.stripeStyle === 'classic' ? 2 : 3.5;
-      ctx.strokeStyle = styleSet.stripeStyle === 'neon_ring' ? ballHex : styleSet.medallionRing;
-      ctx.stroke();
 
-      ctx.fillStyle = styleSet.stripeStyle === 'neon_ring' ? ballHex : styleSet.medallionText;
-      ctx.font = 'bold 42px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(id), cx, cy + 2);
+      if (styleSet.stripeStyle === 'ropa_triangle') {
+        // Uploaded Set 1 (1000027339.jpg): Rounded Equilateral Triangle Medallion
+        BallTextureBuilder.traceRoundedTriangle(ctx, cx, cy, 48, 9);
+        if (id === 8) {
+          ctx.fillStyle = '#0c0f14';
+          ctx.fill();
+          ctx.lineWidth = 4.5;
+          ctx.strokeStyle = '#e8de8e';
+          ctx.stroke();
+          ctx.fillStyle = '#e8de8e';
+        } else {
+          ctx.fillStyle = styleSet.medallionBg;
+          ctx.fill();
+          ctx.lineWidth = 4.5;
+          ctx.strokeStyle = '#0c0f14';
+          ctx.stroke();
+          ctx.fillStyle = '#0c0f14';
+        }
+        ctx.font = '800 38px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(id), cx, cy + 5);
+      } else if (styleSet.stripeStyle === 'black_ring_pearl') {
+        // Uploaded Set 2 (1000027340.jpg): Solid Black Circle + Crisp White Inner Ring + White Number
+        ctx.beginPath();
+        ctx.arc(cx, cy, 43, 0, Math.PI * 2);
+        ctx.fillStyle = '#0d1117';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 35.5, 0, Math.PI * 2);
+        ctx.lineWidth = 3.5;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 40px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(id), cx, cy + 2);
+      } else if (styleSet.stripeStyle === 'marble_swirl') {
+        // Uploaded Set 3 (1000027341.jpg): Clean Unbordered Cream-White Circle + Bold Black Number (+ 6/9 underline)
+        ctx.beginPath();
+        ctx.arc(cx, cy, 40, 0, Math.PI * 2);
+        ctx.fillStyle = '#faf8f2';
+        ctx.fill();
+
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 40px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(id), cx, cy + (id === 6 || id === 9 ? -1 : 2));
+
+        if (id === 6 || id === 9) {
+          ctx.fillRect(cx - 12, cy + 21, 24, 3.5);
+        }
+      } else {
+        // Classic Pro
+        ctx.beginPath();
+        ctx.arc(cx, cy, 40, 0, Math.PI * 2);
+        ctx.fillStyle = styleSet.medallionBg;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = styleSet.medallionRing;
+        ctx.stroke();
+
+        ctx.fillStyle = styleSet.medallionText;
+        ctx.font = 'bold 42px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(id), cx, cy + 2);
+      }
+
       ctx.restore();
     }
 
@@ -5406,8 +5781,8 @@ class SceneManager {
       const texCanvas = BallTextureBuilder.createBallCanvas(id, setKey);
       const newTex = new THREE.CanvasTexture(texCanvas);
       mesh.material.map = newTex;
-      mesh.material.roughness = setKey === 'neon_cyber' ? 0.18 : setKey === 'royal_gold' ? 0.09 : 0.12;
-      mesh.material.metalness = setKey === 'royal_gold' ? 0.15 : setKey === 'neon_cyber' ? 0.12 : 0.06;
+      mesh.material.roughness = setKey === 'neon_cyber' ? 0.08 : setKey === 'royal_gold' ? 0.09 : 0.11;
+      mesh.material.metalness = setKey === 'neon_cyber' ? 0.15 : setKey === 'royal_gold' ? 0.08 : 0.06;
       mesh.material.needsUpdate = true;
     }
   }
@@ -6786,6 +7161,7 @@ function runAllTests() {
 
       const mainMenuModal = document.getElementById('main-menu-modal');
       const settingsModal = document.getElementById('settings-modal');
+      const installPwaModal = document.getElementById('install-pwa-modal');
       const multiplayerModal = document.getElementById('multiplayer-modal');
       const testsModal = document.getElementById('tests-modal');
       const gameoverModal = document.getElementById('gameover-modal');
@@ -6921,6 +7297,7 @@ function runAllTests() {
         return (
           mainMenuModal.style.display === 'flex' ||
           settingsModal.style.display === 'flex' ||
+          (installPwaModal && installPwaModal.style.display === 'flex') ||
           multiplayerModal.style.display === 'flex' ||
           testsModal.style.display === 'flex' ||
           gameoverModal.style.display === 'flex'
@@ -6995,10 +7372,8 @@ function runAllTests() {
         const deg = Math.round(sceneManager.cameraController.lowPovAngleDeg);
         const slider = document.getElementById('slider-pov-angle');
         const label = document.getElementById('label-pov-angle');
-        const hudLbl = document.getElementById('hud-pov-angle-label');
         if (slider) slider.value = String(deg);
         if (label) label.textContent = deg + '°';
-        if (hudLbl) hudLbl.textContent = 'Angle ' + deg + '°';
       }
 
       function serializeTableState() {
@@ -7744,9 +8119,9 @@ function runAllTests() {
           const btn = document.getElementById(step3Map[k]);
           if (!btn) return;
           if (k === setKey) {
-            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center gap-1 transition shadow-md';
+            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-emerald-500 bg-emerald-600/30 text-emerald-100 flex flex-col items-center justify-between gap-1 transition shadow-md';
           } else {
-            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center gap-1 transition';
+            btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex flex-col items-center justify-between gap-1 transition';
           }
         });
 
@@ -7760,9 +8135,9 @@ function runAllTests() {
           const btn = document.getElementById(settingsMap[k]);
           if (!btn) return;
           if (k === setKey) {
-            btn.className = 'py-1.5 px-2 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500';
+            btn.className = 'py-1.5 px-2.5 rounded-lg bg-emerald-600/40 text-xs font-semibold text-emerald-200 border border-emerald-500 flex items-center gap-2';
           } else {
-            btn.className = 'py-1.5 px-2 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700';
+            btn.className = 'py-1.5 px-2.5 rounded-lg bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center gap-2';
           }
         });
       }
@@ -8220,6 +8595,323 @@ function runAllTests() {
         }
       }, { passive: false });
 
+      // ====================================================================
+      // FULL SCREEN LANDSCAPE MODE & MOBILE HOME-SCREEN SHORTCUT (PWA) SETUP
+      // ====================================================================
+      let deferredInstallPrompt = null;
+      let autoFullScreenOnPlay = true;
+
+      function generatePwaAppIconDataUrl(size) {
+        try {
+          const c = document.createElement('canvas');
+          c.width = size;
+          c.height = size;
+          const ctx = c.getContext('2d');
+
+          // Deep tournament emerald & slate radial background
+          const bg = ctx.createRadialGradient(size * 0.35, size * 0.3, size * 0.05, size * 0.5, size * 0.5, size * 0.7);
+          bg.addColorStop(0, '#10b981');
+          bg.addColorStop(0.55, '#065f46');
+          bg.addColorStop(1, '#070d14');
+          ctx.fillStyle = bg;
+          ctx.beginPath();
+          ctx.roundRect ? ctx.roundRect(0, 0, size, size, size * 0.22) : ctx.rect(0, 0, size, size);
+          ctx.fill();
+
+          // Glossy 8-ball sphere in center
+          const cx = size * 0.5;
+          const cy = size * 0.52;
+          const r = size * 0.34;
+          const ballGrad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.35, r * 0.05, cx, cy, r);
+          ballGrad.addColorStop(0, '#334155');
+          ballGrad.addColorStop(0.4, '#0f172a');
+          ballGrad.addColorStop(1, '#020617');
+          ctx.fillStyle = ballGrad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // White number medallion
+          ctx.fillStyle = '#f8fafc';
+          ctx.beginPath();
+          ctx.arc(cx, cy - r * 0.05, r * 0.42, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Number 8
+          ctx.fillStyle = '#090d16';
+          ctx.font = '900 ' + Math.round(size * 0.22) + 'px Inter, system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('8', cx, cy - r * 0.03);
+
+          return c.toDataURL('image/png');
+        } catch {
+          return '';
+        }
+      }
+
+      (function setupDynamicPwaManifest() {
+        const icon192 = generatePwaAppIconDataUrl(192);
+        const icon512 = generatePwaAppIconDataUrl(512);
+        const appleLink = document.getElementById('apple-touch-icon-link');
+        const favLink = document.getElementById('favicon-link');
+        if (appleLink && icon192) appleLink.href = icon192;
+        if (favLink && icon192) favLink.href = icon192;
+
+        const manifestObj = {
+          name: 'Pro 3D 8-Ball & 9-Ball Pool Club',
+          short_name: 'Pro 3D Pool',
+          description: 'Regulation 3D 8-Ball & 9-Ball Billiards Club with Fullscreen Landscape Play',
+          start_url: window.location.href.split('?')[0].split('#')[0] || './',
+          display: 'fullscreen',
+          display_override: ['fullscreen', 'standalone'],
+          orientation: 'landscape',
+          background_color: '#070d14',
+          theme_color: '#070d14',
+          icons: [
+            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          ]
+        };
+
+        try {
+          const manifestJson = JSON.stringify(manifestObj);
+          const dataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestJson);
+          const manifestLink = document.getElementById('pwa-manifest-link');
+          if (manifestLink) {
+            manifestLink.setAttribute('href', dataUrl);
+          }
+        } catch {}
+
+        // Register Service Worker when served over HTTPS or localhost so Android Chrome enables 1-tap PWA install
+        try {
+          if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+          }
+        } catch {}
+      })();
+
+      function isCurrentlyFullScreen() {
+        return !!(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.msFullscreenElement ||
+          (window.matchMedia && (window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: standalone)').matches)) ||
+          window.navigator.standalone
+        );
+      }
+
+      function updateFullScreenUI() {
+        const fsActive = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+        const standaloneActive = !!(
+          (window.matchMedia && (window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: standalone)').matches)) ||
+          window.navigator.standalone
+        );
+
+        const hudLbl = document.getElementById('hud-fs-label');
+        const menuLbl = document.getElementById('menu-fs-label');
+        const settingsLbl = document.getElementById('settings-fs-label');
+        const modalBtnLbl = document.getElementById('modal-fs-btn-text');
+        const statusText = document.getElementById('pwa-status-text');
+        const modeBadge = document.getElementById('pwa-mode-badge');
+
+        if (hudLbl) hudLbl.textContent = fsActive ? 'Exit Full' : 'Full Screen';
+        if (menuLbl) menuLbl.textContent = fsActive ? 'Exit Full Screen' : 'Play Full Screen';
+        if (settingsLbl) settingsLbl.textContent = fsActive ? 'Exit Full Screen' : 'Enter Full Screen';
+        if (modalBtnLbl) modalBtnLbl.textContent = fsActive ? 'Exit Full Screen Mode' : 'Enter Full Screen Landscape Now';
+
+        if (statusText && modeBadge) {
+          if (standaloneActive) {
+            statusText.textContent = 'Running as Installed Home Screen App (Full Screen)';
+            modeBadge.textContent = 'INSTALLED';
+          } else if (fsActive) {
+            statusText.textContent = 'Full Screen Landscape Mode Active';
+            modeBadge.textContent = 'FULLSCREEN';
+          } else if (deferredInstallPrompt) {
+            statusText.textContent = 'One-Tap Home Screen Install Available!';
+            modeBadge.textContent = '1-TAP INSTALL';
+          } else {
+            statusText.textContent = 'Use Full Screen or Add Shortcut to Home Screen below';
+            modeBadge.textContent = 'BROWSER';
+          }
+        }
+      }
+
+      function lockLandscapeOrientation() {
+        try {
+          if (screen.orientation && typeof screen.orientation.lock === 'function') {
+            const p = screen.orientation.lock('landscape');
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+          }
+        } catch {}
+      }
+
+      function toggleFullScreen(forceEnter = false) {
+        const docEl = document.documentElement;
+        const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+
+        if (!isFs || forceEnter) {
+          if (isFs) {
+            lockLandscapeOrientation();
+            return;
+          }
+          try {
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+            if (req) {
+              const p = req.call(docEl, { navigationUI: 'hide' });
+              if (p && typeof p.then === 'function') {
+                p.then(() => {
+                  lockLandscapeOrientation();
+                  updateFullScreenUI();
+                  setTimeout(handleResize, 120);
+                }).catch(() => {
+                  showStatusPopup('📱 Tip: Tap "Install Mobile Shortcut" on Menu to play Full Screen on iOS/Mobile', 3200, true);
+                });
+              } else {
+                lockLandscapeOrientation();
+              }
+            } else {
+              openInstallPwaModal();
+            }
+          } catch {
+            openInstallPwaModal();
+          }
+        } else {
+          try {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+            if (exit) {
+              const p = exit.call(document);
+              if (p && typeof p.catch === 'function') p.catch(() => {});
+            }
+          } catch {}
+        }
+        setTimeout(() => {
+          updateFullScreenUI();
+          handleResize();
+        }, 150);
+      }
+
+      document.addEventListener('fullscreenchange', () => {
+        updateFullScreenUI();
+        handleResize();
+      });
+      document.addEventListener('webkitfullscreenchange', () => {
+        updateFullScreenUI();
+        handleResize();
+      });
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        const installBtnText = document.getElementById('pwa-install-btn-text');
+        if (installBtnText) {
+          installBtnText.textContent = 'Install App Shortcut Now (1-Tap)';
+        }
+        updateFullScreenUI();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        updateFullScreenUI();
+        showReactionToast('📲 App Shortcut Added to Home Screen!');
+      });
+
+      function openInstallPwaModal() {
+        audio.playUIClick();
+        unlockGameCursor(false);
+        updateFullScreenUI();
+        // Highlight relevant OS guide card
+        const ua = navigator.userAgent || '';
+        const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const androidCard = document.getElementById('pwa-guide-android');
+        const iosCard = document.getElementById('pwa-guide-ios');
+        if (androidCard && iosCard) {
+          if (isIOS) {
+            iosCard.classList.add('ring-2', 'ring-sky-400');
+            androidCard.classList.remove('ring-2', 'ring-emerald-400');
+          } else {
+            androidCard.classList.add('ring-2', 'ring-emerald-400');
+            iosCard.classList.remove('ring-2', 'ring-sky-400');
+          }
+        }
+        installPwaModal.style.display = 'flex';
+      }
+
+      document.getElementById('btn-fullscreen-hud').addEventListener('click', () => {
+        audio.playUIClick();
+        toggleFullScreen(false);
+      });
+      document.getElementById('btn-menu-fullscreen').addEventListener('click', () => {
+        audio.playUIClick();
+        toggleFullScreen(false);
+      });
+      document.getElementById('btn-settings-fullscreen').addEventListener('click', () => {
+        audio.playUIClick();
+        toggleFullScreen(false);
+      });
+      document.getElementById('btn-modal-fullscreen').addEventListener('click', () => {
+        audio.playUIClick();
+        toggleFullScreen(false);
+      });
+
+      document.getElementById('btn-open-install-pwa').addEventListener('click', openInstallPwaModal);
+      document.getElementById('btn-settings-install-pwa').addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+        openInstallPwaModal();
+      });
+      document.getElementById('btn-close-install-pwa').addEventListener('click', () => {
+        audio.playUIClick();
+        installPwaModal.style.display = 'none';
+        if (!isAnyModalOpen()) lockGameCursor();
+      });
+
+      document.getElementById('btn-toggle-auto-fullscreen').addEventListener('click', (e) => {
+        audio.playUIClick();
+        autoFullScreenOnPlay = !autoFullScreenOnPlay;
+        const btn = e.currentTarget;
+        if (autoFullScreenOnPlay) {
+          btn.textContent = 'Auto Full Screen: ON';
+          btn.className = 'px-2.5 py-0.5 rounded-lg bg-emerald-600/30 border border-emerald-500/50 text-[10px] font-bold text-emerald-200 transition';
+        } else {
+          btn.textContent = 'Auto Full Screen: OFF';
+          btn.className = 'px-2.5 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-400 transition';
+        }
+      });
+
+      document.getElementById('btn-trigger-pwa-install').addEventListener('click', async () => {
+        audio.playUIClick();
+        if (deferredInstallPrompt) {
+          try {
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            updateFullScreenUI();
+          } catch {}
+        } else {
+          toggleFullScreen(true);
+          showStatusPopup('📲 Use Browser Menu (⋮ or Share ↑) -> "Add to Home Screen"', 3400, true);
+        }
+      });
+
+      document.getElementById('btn-download-standalone-html').addEventListener('click', () => {
+        audio.playUIClick();
+        try {
+          const fullHtml = '<!DOCTYPE html>' + String.fromCharCode(10) + document.documentElement.outerHTML;
+          const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Pro_3D_Pool_Club.html';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 3000);
+          showReactionToast('💾 Downloaded Pro_3D_Pool_Club.html!');
+        } catch {
+          showStatusPopup('Download available via Project Archive ZIP', 2600, true);
+        }
+      });
+
       // Online Multiplayer Lobby Modal Wiring
       function openMultiplayerLobby() {
         audio.playUIClick();
@@ -8426,6 +9118,9 @@ function runAllTests() {
 
       // Step 3 Launch Button Handler
       document.getElementById('btn-launch-configured-match').addEventListener('click', () => {
+        if (autoFullScreenOnPlay && isTouchDevice() && !isCurrentlyFullScreen()) {
+          toggleFullScreen(true);
+        }
         if (selectedMenuPlayMode === 'online') {
           openMultiplayerLobby();
         } else {
@@ -8657,6 +9352,7 @@ function runAllTests() {
           if (isAnyModalOpen()) {
             mainMenuModal.style.display = 'none';
             settingsModal.style.display = 'none';
+            if (installPwaModal) installPwaModal.style.display = 'none';
             multiplayerModal.style.display = 'none';
             testsModal.style.display = 'none';
             lockGameCursor();
